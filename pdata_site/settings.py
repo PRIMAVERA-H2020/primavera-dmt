@@ -18,7 +18,7 @@ import os
 DEBUG = False
 
 # Now import local settings (that might override DEBUG settings)
-from settings_local import *
+from .settings_local import *
 
 # Application definition
 

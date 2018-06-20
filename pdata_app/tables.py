@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
-import os
-from urllib import urlencode
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 
 from django.db.models import Count, Sum
 from django.template.defaultfilters import filesizeformat

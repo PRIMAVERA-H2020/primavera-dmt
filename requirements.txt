@@ -1,7 +1,7 @@
-django==1.11
+django==2.0.6
 django-solo
 pytz
 psycopg2==2.6.2
 google-api-python-client
-django-tables2==1.17.1
+django-tables2==1.21.2
 django-filter==1.1.0
