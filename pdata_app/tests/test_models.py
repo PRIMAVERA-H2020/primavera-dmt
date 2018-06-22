@@ -179,7 +179,7 @@ class TestDataFileAggregationBaseMethods(TestCase):
 
         expected = ['Monty', 'Python']
 
-        self.assertEqual(model_names, expected)
+        self.assertEqual(model_names.sort(), expected.sort())
 
     def test_frequency(self):
         frequencies = self.dsub.frequency()

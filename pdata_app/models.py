@@ -191,7 +191,7 @@ class DataFileAggregationBase(models.Model):
     def _file_aggregation(self, field_name):
         records = [getattr(datafile, field_name) for datafile in self.get_data_files()]
         # Return unique sorted set of records
-        unique_records = sorted(set(records))
+        unique_records = list(set(records))
         if unique_records == [None]:
             return None
         else:
