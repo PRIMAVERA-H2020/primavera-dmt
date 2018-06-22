@@ -9,7 +9,7 @@ import os
 import re
 
 import cf_units
-from numpy.testing import assert_almost_equal
+import netcdftime
 import pytz
 
 from django.contrib.auth.models import User
@@ -553,7 +553,7 @@ def _date_from_string(date_str):
     components = re.match(r'(\d{4})(\d{2})(\d{2})', date_str)
 
     if components:
-        date_obj = cf_units.netcdftime.datetime(int(components.group(1)), int(components.group(2)),
+        date_obj = netcdftime.datetime(int(components.group(1)), int(components.group(2)),
             int(components.group(3)))
     else:
         msg = 'Unable to parse date string (expecting YYYYMMDD): {}'.format(date_str)
@@ -579,7 +579,7 @@ def _cmpts2num(year, month, day, hour, minute, second, microsecond, time_units, 
     :returns: The specified date as a floating point number relative to
         `time_units`
     """
-    dt_obj = cf_units.netcdftime.datetime(year, month, day, hour, minute,
+    dt_obj = netcdftime.datetime(year, month, day, hour, minute,
         second, microsecond)
 
     return cf_units.date2num(dt_obj, time_units, calendar)

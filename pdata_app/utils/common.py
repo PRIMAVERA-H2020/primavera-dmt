@@ -12,6 +12,7 @@ from subprocess import check_output, CalledProcessError
 from tempfile import gettempdir
 
 from iris.time import PartialDateTime
+import netcdftime
 import cf_units
 
 from django.db.models import Sum
@@ -132,9 +133,9 @@ def calc_last_day_in_month(year, month, calendar):
     ref_units = 'days since 1969-07-21'
 
     if month == 12:
-        start_next_month_obj = cf_units.netcdftime.datetime(year + 1, 1, 1)
+        start_next_month_obj = netcdftime.datetime(year + 1, 1, 1)
     else:
-        start_next_month_obj = cf_units.netcdftime.datetime(year, month + 1, 1)
+        start_next_month_obj = netcdftime.datetime(year, month + 1, 1)
 
     start_next_month = cf_units.date2num(start_next_month_obj, ref_units,
         calendar)
@@ -188,7 +189,7 @@ def pdt2num(pdt, time_units, calendar, start_of_period=True):
         if attr_value:
             datetime_attrs[attr] = attr_value
 
-    dt_obj = cf_units.netcdftime.datetime(**datetime_attrs)
+    dt_obj = netcdftime.datetime(**datetime_attrs)
 
     return cf_units.date2num(dt_obj, time_units, calendar)
 
