@@ -1,6 +1,8 @@
 """
 Unit tests for pdata_app.utils.dbapi
 """
+from __future__ import unicode_literals, division, absolute_import
+
 from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
 from django.test import TestCase

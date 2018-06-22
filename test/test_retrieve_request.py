@@ -1,6 +1,7 @@
 """
 test_validate_data_submission.py - unit tests for retrieve_request.py
 """
+from __future__ import unicode_literals, division, absolute_import
 import datetime
 import mock
 
@@ -163,16 +164,16 @@ class TestIntegrationTests(TestCase):
         self.mock_rename.assert_called_once_with(
             '/group_workspaces/jasmin2/primavera5/.et_retrievals/ret_999999/'
             'batch_01234/gws/MOHC/MY-MODEL/incoming/v12345678/file_one.nc',
-            u'/group_workspaces/jasmin2/primavera5/stream1/CMIP6/HighResMIP/'
-            u'MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/my-var/gn/v12345678/'
-            u'file_one.nc'
+            '/group_workspaces/jasmin2/primavera5/stream1/CMIP6/HighResMIP/'
+            'MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/my-var/gn/v12345678/'
+            'file_one.nc'
         )
 
         self.assertTrue(df.online)
-        self.assertEqual(df.directory, u'/group_workspaces/jasmin2/primavera5/'
-                                       u'stream1/CMIP6/HighResMIP/MOHC/'
-                                       u'MY-MODEL/experiment/r1i1p1f1/'
-                                       u'my-table/my-var/gn/v12345678')
+        self.assertEqual(df.directory, '/group_workspaces/jasmin2/primavera5/'
+                                       'stream1/CMIP6/HighResMIP/MOHC/'
+                                       'MY-MODEL/experiment/r1i1p1f1/'
+                                       'my-table/my-var/gn/v12345678')
 
     def test_multiple_tapes(self):
         ret_req = get_or_create(RetrievalRequest, requester=self.user,
@@ -214,12 +215,12 @@ class TestIntegrationTests(TestCase):
         for data_file in DataFile.objects.all():
             self.assertTrue(data_file.online)
             self.assertIn(data_file.directory, [
-                u'/group_workspaces/jasmin2/primavera5/stream1/CMIP6/'
-                u'HighResMIP/MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/'
-                u'my-var/gn/v12345678',
-                u'/group_workspaces/jasmin2/primavera5/stream1/CMIP6/HighResMIP/'
-                u'MOHC/MY-MODEL/experiment/r1i1p1f1/your-table/your-var/'
-                u'gn/v12345678'
+                '/group_workspaces/jasmin2/primavera5/stream1/CMIP6/'
+                'HighResMIP/MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/'
+                'my-var/gn/v12345678',
+                '/group_workspaces/jasmin2/primavera5/stream1/CMIP6/HighResMIP/'
+                'MOHC/MY-MODEL/experiment/r1i1p1f1/your-table/your-var/'
+                'gn/v12345678'
             ])
 
     def test_bad_retrieval_id(self):
@@ -286,16 +287,16 @@ class TestIntegrationTests(TestCase):
         self.mock_rename.assert_called_once_with(
             '/group_workspaces/jasmin2/primavera3/.et_retrievals/ret_999999/'
             'batch_01234/gws/MOHC/MY-MODEL/incoming/v12345678/file_one.nc',
-            u'/group_workspaces/jasmin2/primavera3/spare_dir/CMIP6/HighResMIP/'
-            u'MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/my-var/gn/'
-            u'v12345678/file_one.nc'
+            '/group_workspaces/jasmin2/primavera3/spare_dir/CMIP6/HighResMIP/'
+            'MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/my-var/gn/'
+            'v12345678/file_one.nc'
         )
 
         self.mock_symlink.assert_called_once_with(
-            u'/group_workspaces/jasmin2/primavera3/spare_dir/CMIP6/HighResMIP/'
-            u'MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/my-var/gn/'
-            u'v12345678/file_one.nc',
-            u'/group_workspaces/jasmin2/primavera5/stream1/CMIP6/HighResMIP/'
-            u'MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/my-var/gn/v12345678/'
-            u'file_one.nc'
+            '/group_workspaces/jasmin2/primavera3/spare_dir/CMIP6/HighResMIP/'
+            'MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/my-var/gn/'
+            'v12345678/file_one.nc',
+            '/group_workspaces/jasmin2/primavera5/stream1/CMIP6/HighResMIP/'
+            'MOHC/MY-MODEL/experiment/r1i1p1f1/my-table/my-var/gn/v12345678/'
+            'file_one.nc'
         )

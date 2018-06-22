@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 auto_retrieve.py
 
@@ -6,6 +6,8 @@ This script is designed to run in a persistent screen session and to
 periodically restore any data that needs to be restored from either elastic
 tape or MASS.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import datetime
 import logging.config

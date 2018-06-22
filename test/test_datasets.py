@@ -7,6 +7,7 @@ a set of test datasets to use.
 """
 
 # Standard library imports
+from __future__ import unicode_literals, division, absolute_import
 import os
 
 class DatasetForTests(object):

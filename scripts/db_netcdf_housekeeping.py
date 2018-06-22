@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 db_netcdf_housekeeping.py
 
@@ -11,6 +11,8 @@ online flag and directory.
 2. it scans through the specified directory structure and checks that each
 netCDF file found is marked as online and has the correct directory.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import logging.config
 import os

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 make_dummy_data.py
 
@@ -12,6 +12,9 @@ VariableRequests.
 The reset_db.sh script can be used by the user to clear the database before
 running this script if desired.
 """
+from __future__ import (unicode_literals, division, absolute_import,
+                        print_function)
+
 import os
 import re
 
@@ -136,7 +139,7 @@ def make_data_submission():
         else:
             msg = ('No variable request found for file: {}. Please create a '
                    'variable request and resubmit.'.format(dfile_name))
-            print 'ERROR: ' + msg
+            print('ERROR: ' + msg)
             raise ValueError(msg)
 
         _dfile = DataFile.objects.create(name=dfile_name, incoming_directory=test_dsub.INCOMING_DIR,

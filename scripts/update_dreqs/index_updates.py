@@ -1,10 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 index_updates.py
 
 This file adds an issue to any ECMWF-IFS-LR coupled files received so far
 describing the coupling issue that was found with them.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import glob
 import importlib
@@ -22,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 HTML_FILE = 'update_dreqs.html'
+
 
 def _ouput_headers(fh):
     txt = """<html>
@@ -74,7 +77,6 @@ def main(args):
             fh.write('<tr><td>{}</td><td>{}</td></tr>\n'.format(file_name,
                                                                 description))
         _ouput_footers(fh)
-
 
 
 if __name__ == "__main__":

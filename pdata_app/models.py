@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import re
 
 import cf_units
@@ -47,7 +48,7 @@ class Settings(SingletonModel):
         verbose_name = "Settings"
 
     def __unicode__(self):
-        return u"App Settings"
+        return "App Settings"
 
 
 class Project(models.Model):
@@ -152,7 +153,7 @@ class VariableRequest(models.Model):
     positive = models.CharField(max_length=20, null=True, blank=True,
                                   verbose_name='Positive')
     variable_type = models.CharField(max_length=20,
-                                     choices=VARIABLE_TYPES.items(),
+                                     choices=list(VARIABLE_TYPES.items()),
                                      null=False, blank=False,
                                   verbose_name='Variable Type')
     dimensions = models.CharField(max_length=200, null=False, blank=False,
@@ -162,7 +163,7 @@ class VariableRequest(models.Model):
     modeling_realm = models.CharField(max_length=20, null=False, blank=False,
                                   verbose_name='Modeling Realm')
     frequency = models.CharField(max_length=200,
-                                 choices=FREQUENCY_VALUES.items(),
+                                 choices=list(FREQUENCY_VALUES.items()),
                                  null=False, blank=False,
                                   verbose_name='Frequency')
     cell_measures = models.CharField(max_length=200, null=False, blank=False,
@@ -331,7 +332,7 @@ class DataSubmission(DataFileAggregationBase):
     # start_time
     # end_time
 
-    status = models.CharField(max_length=20, choices=STATUS_VALUES.items(),
+    status = models.CharField(max_length=20, choices=list(STATUS_VALUES.items()),
                               verbose_name='Status',
                               default=STATUS_VALUES.EXPECTED,
                               blank=False, null=False)
@@ -485,7 +486,7 @@ class DataRequest(DataFileAggregationBase):
                                   null=False, blank=False)
     calendar = models.CharField(verbose_name='Calendar', max_length=20,
                                 null=False, blank=False,
-                                choices=CALENDARS.items())
+                                choices=list(CALENDARS.items()))
 
     def start_date_string(self):
         """Return a string containing the start date"""
@@ -544,7 +545,7 @@ class DataFile(models.Model):
                                    verbose_name='Experiment')
     variable_request = models.ForeignKey(VariableRequest, null=False, on_delete=PROTECT)
     data_request = models.ForeignKey(DataRequest, null=False, on_delete=PROTECT)
-    frequency = models.CharField(max_length=20, choices=FREQUENCY_VALUES.items(),
+    frequency = models.CharField(max_length=20, choices=list(FREQUENCY_VALUES.items()),
         verbose_name="Time frequency", null=False, blank=False)
     rip_code = models.CharField(max_length=20, verbose_name="Variant Label",
                                 null=False, blank=False)
@@ -557,7 +558,7 @@ class DataFile(models.Model):
     end_time = models.FloatField(verbose_name="End time", null=True, blank=True)
     time_units = models.CharField(verbose_name='Time units', max_length=50, null=True, blank=True)
     calendar = models.CharField(verbose_name='Calendar', max_length=20,
-        null=True, blank=True, choices=CALENDARS.items())
+        null=True, blank=True, choices=list(CALENDARS.items()))
 
     data_submission = models.ForeignKey(DataSubmission, null=False, blank=False,
         on_delete=CASCADE)
@@ -630,7 +631,7 @@ class ReplacedFile(models.Model):
     data_request = models.ForeignKey(DataRequest, null=False,
                                      on_delete=PROTECT)
     frequency = models.CharField(max_length=20,
-                                 choices=FREQUENCY_VALUES.items(),
+                                 choices=list(FREQUENCY_VALUES.items()),
                                  verbose_name="Time frequency",
                                  null=False, blank=False)
     rip_code = models.CharField(max_length=20, verbose_name="Variant Label",
@@ -648,7 +649,7 @@ class ReplacedFile(models.Model):
                                   null=True, blank=True)
     calendar = models.CharField(verbose_name='Calendar', max_length=20,
                                 null=True, blank=True,
-                                choices=CALENDARS.items())
+                                choices=list(CALENDARS.items()))
 
     data_submission = models.ForeignKey(DataSubmission,
                                         null=False, blank=False,
@@ -661,7 +662,7 @@ class ReplacedFile(models.Model):
     # Checksum
     checksum_value = models.CharField(max_length=200, null=True, blank=True)
     checksum_type = models.CharField(max_length=20,
-                                     choices=CHECKSUM_TYPES.items(),
+                                     choices=list(CHECKSUM_TYPES.items()),
                                      null=True, blank=True)
 
     def start_date_string(self):
@@ -720,7 +721,7 @@ class Checksum(models.Model):
     data_file = models.ForeignKey(DataFile, null=False, blank=False,
         on_delete=CASCADE)
     checksum_value = models.CharField(max_length=200, null=False, blank=False)
-    checksum_type = models.CharField(max_length=20, choices=CHECKSUM_TYPES.items(), null=False,
+    checksum_type = models.CharField(max_length=20, choices=list(CHECKSUM_TYPES.items()), null=False,
                                      blank=False)
 
     def __unicode__(self):
@@ -975,7 +976,7 @@ class ObservationFile(models.Model):
 
     checksum_value = models.CharField(max_length=200, null=True, blank=True)
     checksum_type = models.CharField(max_length=20,
-                                     choices=CHECKSUM_TYPES.items(),
+                                     choices=list(CHECKSUM_TYPES.items()),
                                      null=True, blank=True)
 
     # DateTimes are allowed to be null/blank because some fields (such as
@@ -988,7 +989,7 @@ class ObservationFile(models.Model):
                                   null=True, blank=True)
     calendar = models.CharField(verbose_name='Calendar', max_length=20,
                                 null=True, blank=True,
-                                choices=CALENDARS.items())
+                                choices=list(CALENDARS.items()))
     frequency = models.CharField(max_length=200, null=True, blank=True,
                                  verbose_name='Frequency')
 

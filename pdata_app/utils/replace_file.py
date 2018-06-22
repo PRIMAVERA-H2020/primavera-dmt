@@ -1,6 +1,8 @@
 """
 replace_file.py - a function to move DataFile entries to a ReplacedFile entry.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import logging.config
 from pdata_app.models import DataFile, ReplacedFile
 

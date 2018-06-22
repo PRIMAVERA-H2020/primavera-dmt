@@ -1,1 +1,1 @@
-from vocabs.vocabs import *
+from .vocabs import *

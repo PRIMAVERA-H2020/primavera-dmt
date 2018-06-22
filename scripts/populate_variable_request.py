@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 populate_variable_request.py
 
@@ -10,6 +10,8 @@ https://developers.google.com/sheets/quickstart/python
 To load the spreadsheet at:
 https://docs.google.com/spreadsheets/d/1ewKkyuaUq99HUefWIdb3JzqUwwnPLNUGJxbQyqa-10U/
 """
+from __future__ import (unicode_literals, division, absolute_import,
+                        print_function)
 import httplib2
 import os
 
@@ -70,7 +72,7 @@ def get_credentials():
             credentials = tools.run_flow(flow, store, flags)
         else:  # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
-        print('Storing credentials to ' + credential_path)
+        print(('Storing credentials to ' + credential_path))
     return credentials
 
 
@@ -96,7 +98,7 @@ def main():
 
     for sheet in sheet_names:
         range_name = '{}!A2:AI'.format(sheet)
-        result = service.spreadsheets().values().get(
+        result = list(service.spreadsheets().values()).get(
             spreadsheetId=SPREADSHEET_ID, range=range_name).execute()
         values = result.get('values', [])
 
@@ -117,8 +119,8 @@ def main():
                 except (KeyError, IndexError):
                     # display some information to work out where the error
                     # happened and then re-raise the exception to crash out
-                    print 'cmor_name: {} table: {}'.format(row[11], sheet)
-                    print row
+                    print('cmor_name: {} table: {}'.format(row[11], sheet))
+                    print(row)
                     raise
 
 if __name__ == '__main__':

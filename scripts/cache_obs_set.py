@@ -1,10 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 cache_obs_set.py
 
 For each observation set, cache the foreign key relationships to speed the page
 load.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import logging.config
 import os

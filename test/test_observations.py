@@ -1,6 +1,7 @@
 """
 test_observations.py - unit tests for the observations classes
 """
+from __future__ import unicode_literals, division, absolute_import
 import django
 django.setup()
 

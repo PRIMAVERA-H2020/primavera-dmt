@@ -1,7 +1,11 @@
+from __future__ import unicode_literals, division, absolute_import
 import datetime
 import os
 import re
-import urllib
+try:
+    from urllib.parse import urlencode  # Python 3
+except ImportError:
+    from urllib import urlencode  # Python 2.7
 
 import cf_units
 
@@ -530,5 +534,5 @@ def _custom_redirect(url_name, *args, **kwargs):
     :return: An HTTP response
     """
     url = reverse(url_name, args=args)
-    params = urllib.urlencode(kwargs)
+    params = urlencode(kwargs)
     return HttpResponseRedirect(url + "?%s" % params)

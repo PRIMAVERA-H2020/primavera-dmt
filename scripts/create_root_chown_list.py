@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 create_root_chown_list.py
 
@@ -8,6 +8,8 @@ file will then be read by another cron job running as CEDA root, which will
 chown the files in the submission from the user who submitted them to the
 PRIMAVERA DMT admin user.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import django
 django.setup()
 from pdata_app.models import DataSubmission

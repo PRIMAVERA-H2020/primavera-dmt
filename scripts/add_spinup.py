@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 add_spinup.py
 
@@ -10,6 +10,8 @@ https://developers.google.com/sheets/quickstart/python
 To load the spreadsheet at:
 https://docs.google.com/spreadsheets/d/1ewKkyuaUq99HUefWIdb3JzqUwwnPLNUGJxbQyqa-10U/
 """
+from __future__ import (unicode_literals, division, absolute_import,
+                        print_function)
 from datetime import datetime
 import httplib2
 import os
@@ -76,7 +78,7 @@ def get_credentials():
             credentials = tools.run_flow(flow, store, flags)
         else:  # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
-        print 'Storing credentials to ' + credential_path
+        print('Storing credentials to ' + credential_path)
     return credentials
 
 
@@ -108,7 +110,7 @@ def is_awi(sheet_cell):
     elif status_ignored == 'FALSE':
         return False
     else:
-        print 'Unknown AWI status: {}. Ignoring.'.format(sheet_cell)
+        print('Unknown AWI status: {}. Ignoring.'.format(sheet_cell))
         return False
 
 
@@ -129,7 +131,7 @@ def is_cnrm(sheet_cell):
               int_string[0] == '-999'):
             return False
         else:
-            print 'Unknown CNRM status: {}. Ignoring.'.format(sheet_cell)
+            print('Unknown CNRM status: {}. Ignoring.'.format(sheet_cell))
             return False
 
 
@@ -154,7 +156,7 @@ def is_ec_earth(sheet_cell):
     elif sheet_cell.upper() == 'FALSE' or sheet_cell.upper() == 'NO':
         return False
     else:
-        print 'Unknown EC-Earth status: {}. Ignoring.'.format(sheet_cell)
+        print('Unknown EC-Earth status: {}. Ignoring.'.format(sheet_cell))
         return False
 
 
@@ -170,7 +172,7 @@ def is_mpi(sheet_cell):
     elif status_ignored == 'FALSE' or status_ignored == 'NO':
         return False
     else:
-        print 'Unknown MPI status: {}. Ignoring.'.format(sheet_cell)
+        print('Unknown MPI status: {}. Ignoring.'.format(sheet_cell))
         return False
 
 
@@ -257,7 +259,7 @@ def main():
             experiment_objs.append(expt_obj)
         else:
             msg = 'experiment {} not found in the database.'.format(expt)
-            print msg
+            print(msg)
             raise ValueError(msg)
 
     # Look up the Institute object for each institute_id  and save the
@@ -271,7 +273,7 @@ def main():
             msg = 'institute_id {} not found in the database.'.format(
                 institutes[col_num]['id']
             )
-            print msg
+            print(msg)
             raise ValueError(msg)
 
     # Look up the ClimateModel object for each institute_id  and save the
@@ -286,7 +288,7 @@ def main():
             else:
                 msg = ('climate_model {} not found in the database.'.
                        format(clim_model))
-                print msg
+                print(msg)
                 raise ValueError(msg)
 
     # The standard reference time
@@ -295,13 +297,13 @@ def main():
     # Loop through each sheet
     for sheet in sheet_names:
         range_name = '{}!A2:AI'.format(sheet)
-        result = service.spreadsheets().values().get(
+        result = list(service.spreadsheets().values()).get(
             spreadsheetId=SPREADSHEET_ID, range=range_name).execute()
         values = result.get('values', [])
 
         if not values:
             msg = ('No data found in sheet {}.'.format(sheet))
-            print msg
+            print(msg)
             raise ValueError(msg)
 
         if sheet.startswith('Prim'):
@@ -355,12 +357,12 @@ def main():
                                 msg = ('Unable to find variable request matching '
                                        'cmor_name {} and table_name {} in the '
                                        'database.'.format(row[11], sheet))
-                                print msg
+                                print(msg)
                                 raise ValueError(msg)
             except IndexError:
                 msg = ('Exception at Sheet: {} Variable: {}'.
                        format(sheet, row[11]))
-                print msg
+                print(msg)
                 raise
 
 

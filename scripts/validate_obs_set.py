@@ -1,9 +1,11 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 validate_obs_set.py
 
 Capture the metadata from an observations set and add this to the database.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import logging.config
 import os

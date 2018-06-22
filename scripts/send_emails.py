@@ -1,9 +1,9 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 email.py - various functions to work with emails in the pdata application
 """
+from __future__ import unicode_literals, division, absolute_import
 import argparse
-import logging
 import logging.config
 from smtplib import SMTPException
 import sys

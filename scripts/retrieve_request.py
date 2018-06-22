@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 retrieve_request.py
 
@@ -10,6 +10,8 @@ system, but this is not checked by this script. `split_retrieve_request.py`
 and `auto_retrieve.py` can be used to split requests and run them on the
 appropriate tape systems respectively.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import datetime
 import glob

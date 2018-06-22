@@ -1,10 +1,11 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 validate_data_submission.py
 
 This script is run by users to validate submitted data files and to create a
 data submission in the Data Management Tool.
 """
+from __future__ import unicode_literals, division, absolute_import
 import argparse
 import datetime
 import itertools
@@ -82,9 +83,9 @@ def identify_and_validate(filenames, project, num_processes, file_format):
         jobs.append(p)
         p.start()
 
-    func_input_pair = zip(filenames,
+    func_input_pair = list(zip(filenames,
                           (project,) * len(filenames),
-                          (file_format,) * len(filenames))
+                          (file_format,) * len(filenames)))
     blank_pair = (None, None, None)
 
     iters = itertools.chain(func_input_pair, (blank_pair,) * num_processes)

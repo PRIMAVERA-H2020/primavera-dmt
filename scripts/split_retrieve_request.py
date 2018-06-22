@@ -1,10 +1,11 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 split_retrieve_request.py
 
 This script is run by a cron job to separate retrieve_requests into ones
 on elastic tape and ones in MASS.
 """
+from __future__ import unicode_literals, division, absolute_import
 import argparse
 import logging.config
 import sys

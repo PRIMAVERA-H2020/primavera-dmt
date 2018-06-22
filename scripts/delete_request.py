@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 delete_request.py
 
@@ -6,6 +6,8 @@ This script is run by the admin to delete previously retrieved data from the
 file structure. All other retrievals are checked for files that are still
 required online.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import datetime
 import logging.config

@@ -1,10 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 incoming_to_drs.py
 
 This script is run by the admin to copy data files from their incoming
 directory into the common DRS structure.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import logging.config
 import os

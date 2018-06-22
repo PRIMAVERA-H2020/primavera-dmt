@@ -1,10 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 high_freq_list.py
 
 This script will generate a summary of the high frequency (daily or higher)
 variables that are being generated.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import logging.config
 import sys

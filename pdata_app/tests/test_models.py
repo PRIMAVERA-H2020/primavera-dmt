@@ -1,6 +1,9 @@
 """
 Unit tests for pdata_app.models
 """
+from __future__ import unicode_literals, division, absolute_import
+import six
+
 import datetime
 import os
 import re
@@ -33,7 +36,7 @@ class TestProject(TestCase):
 
     def test_unicode(self):
         proj = models.Project.objects.first()
-        self.assertEqual(unicode(proj), u't')
+        self.assertEqual(str(proj), 't')
 
 
 class TestInstitute(TestCase):
@@ -45,7 +48,7 @@ class TestInstitute(TestCase):
 
     def test_unicode(self):
         inst = models.Institute.objects.first()
-        self.assertEqual(unicode(inst), u't')
+        self.assertEqual(str(inst), 't')
 
 
 class TestClimateModel(TestCase):
@@ -57,7 +60,7 @@ class TestClimateModel(TestCase):
 
     def test_unicode(self):
         clim_model = models.ClimateModel.objects.first()
-        self.assertEqual(unicode(clim_model), u't')
+        self.assertEqual(str(clim_model), 't')
 
 
 class TestExperiment(TestCase):
@@ -69,7 +72,7 @@ class TestExperiment(TestCase):
 
     def test_unicode(self):
         expt = models.Experiment.objects.first()
-        self.assertEqual(unicode(expt), u't')
+        self.assertEqual(str(expt), 't')
 
 
 class ActivityId(TestCase):
@@ -81,7 +84,7 @@ class ActivityId(TestCase):
 
     def test_unicode(self):
         expt = models.ActivityId.objects.first()
-        self.assertEqual(unicode(expt), u't')
+        self.assertEqual(str(expt), 't')
 
 
 class TestVariableRequest(TestCase):
@@ -98,7 +101,7 @@ class TestVariableRequest(TestCase):
 
     def test_unicode(self):
         vble = models.VariableRequest.objects.first()
-        self.assertEqual(unicode(vble), u'VariableRequest: var1 (Amon)')
+        self.assertEqual(str(vble), 'VariableRequest: var1 (Amon)')
 
 
 class TestDataFileAggregationBaseMethods(TestCase):
@@ -162,7 +165,7 @@ class TestDataFileAggregationBaseMethods(TestCase):
         files = self.dsub.get_data_files()
         filenames = [df.name for df in files]
 
-        expected = [unicode(fn) for fn in self.example_files.files]
+        expected = [str(fn) for fn in self.example_files.files]
 
         self.assertEqual(filenames.sort(), expected.sort())
 
@@ -174,7 +177,7 @@ class TestDataFileAggregationBaseMethods(TestCase):
         model_names = [cm.short_name for cm in clim_models]
         model_names.sort()
 
-        expected = [u'Monty', u'Python']
+        expected = ['Monty', 'Python']
 
         self.assertEqual(model_names, expected)
 
@@ -182,7 +185,7 @@ class TestDataFileAggregationBaseMethods(TestCase):
         frequencies = self.dsub.frequency()
         frequencies.sort()
 
-        expected = [u'ann']
+        expected = ['ann']
 
         self.assertEqual(frequencies, expected)
 
@@ -199,7 +202,7 @@ class TestDataFileAggregationBaseMethods(TestCase):
         tape_urls = self.dsub.get_tape_urls()
         tape_urls.sort()
 
-        expected = [u'et:1234']
+        expected = ['et:1234']
 
         self.assertEqual(tape_urls, expected)
 
@@ -208,7 +211,7 @@ class TestDataFileAggregationBaseMethods(TestCase):
         file_versions = self.dsub.get_file_versions()
         file_versions.sort()
 
-        expected = [u'v20161225']
+        expected = ['v20161225']
 
         self.assertEqual(file_versions, expected)
 
@@ -341,7 +344,7 @@ class TestDataSubmission(TestCase):
 
     def test_unicode(self):
         data_sub = models.DataSubmission.objects.first()
-        self.assertEqual(unicode(data_sub), u'Data Submission: /some/dir')
+        self.assertEqual(str(data_sub), 'Data Submission: /some/dir')
 
 
 class TestCEDADataset(TestCase):
@@ -354,7 +357,7 @@ class TestCEDADataset(TestCase):
 
     def test_unicode(self):
         ceda_ds = models.CEDADataset.objects.first()
-        self.assertEqual(unicode(ceda_ds), u'CEDA Dataset: http://some.url/')
+        self.assertEqual(str(ceda_ds), 'CEDA Dataset: http://some.url/')
 
 
 class TestESGFDatasetMethods(TestCase):
@@ -390,12 +393,12 @@ class TestESGFDatasetMethods(TestCase):
         self.assertEqual(self.esgf_ds.directory, '/some/dir')
 
     def test_unicode(self):
-        unicode_drs = unicode(self.esgf_ds)
+        unicode_drs = str(self.esgf_ds)
 
         expected = 'a.b.c.d.v20160720'
 
         self.assertEqual(unicode_drs, expected)
-        self.assertIsInstance(unicode_drs, unicode)
+        self.assertIsInstance(unicode_drs, str)
 
 
 class TestDataFile(TestCase):
@@ -440,8 +443,8 @@ class TestDataFile(TestCase):
 
     def test_unicode(self):
         data_file = models.DataFile.objects.first()
-        self.assertEqual(unicode(data_file),
-            u'filename.nc (Directory: /other/dir)')
+        self.assertEqual(str(data_file),
+            'filename.nc (Directory: /other/dir)')
 
 
 class TestDataIssue(TestCase):
@@ -456,7 +459,7 @@ class TestDataIssue(TestCase):
 
     def test_unicode(self):
         data_issue = models.DataIssue.objects.first()
-        self.assertRegexpMatches(str(data_issue),
+        six.assertRegex(str(data_issue),
             r'Data Issue \([0-9 :-]{19}\): test \(me\)')
 
 
@@ -508,7 +511,7 @@ class TestChecksum(TestCase):
 
     def test_unicode(self):
         chk_sum = models.Checksum.objects.all()[0]
-        self.assertEqual(unicode(chk_sum), u'ADLER32: 12345678 (filename.nc)')
+        self.assertEqual(str(chk_sum), 'ADLER32: 12345678 (filename.nc)')
 
 
 def _extract_file_metadata(file_path):

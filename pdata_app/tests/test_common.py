@@ -1,6 +1,9 @@
 """
 test_common.py - unit tests for pdata_app.utils.common.py
 """
+from __future__ import unicode_literals, division, absolute_import
+import six
+
 from iris.time import PartialDateTime
 from numpy.testing import assert_almost_equal
 
@@ -160,7 +163,7 @@ class TestIsSameGws(TestCase):
         path1 = 'primavera1/some/dir'
         path2 = '/group_workspaces/jasmin2/primavera2/some/dir'
 
-        self.assertRaisesRegexp(RuntimeError, 'Cannot determine group '
+        six.assertRaisesRegex(RuntimeError, 'Cannot determine group '
             'workspace name from primavera1/some/dir', is_same_gws,
                                 path1, path2)
 
@@ -168,7 +171,7 @@ class TestIsSameGws(TestCase):
         path1 = '/group_workspaces/jasmin2/primavera2/some/dir'
         path2 = '/group_workspaces/jasmin1/primavera1/some/dir'
 
-        self.assertRaisesRegexp(RuntimeError, 'Cannot determine group '
+        six.assertRaisesRegex(RuntimeError, 'Cannot determine group '
             'workspace name from /group_workspaces/jasmin1/primavera1/some/dir',
                                 is_same_gws, path1, path2)
 

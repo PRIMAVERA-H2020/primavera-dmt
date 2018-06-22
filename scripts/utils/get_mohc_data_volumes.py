@@ -1,10 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 get_mohc_data_volumes.py
 
 This script will write to file the total volumes of data currently held for the various
 HadGEM3 models.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 from collections import OrderedDict
 from copy import copy
@@ -89,12 +91,12 @@ def main(args):
                         data_volume = data_volume * 2
                     proj_total += data_volume
                     human_readable = filesizeformat(data_volume)
-                    human_readable = str(human_readable.replace(u'\xa0', ' '))
+                    human_readable = str(human_readable.replace('\xa0', ' '))
                     fh.write('{}, {}, {}, {}\n'.format(model, expt,
                                                        data_volume,
                                                        str(human_readable)))
             human_readable = filesizeformat(proj_total)
-            human_readable = str(human_readable.replace(u'\xa0', ' '))
+            human_readable = str(human_readable.replace('\xa0', ' '))
             fh.write('{} total, , {}, {}\n\n'.format(proj, proj_total,
                                                    str(human_readable)))
 

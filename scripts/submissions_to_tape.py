@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 submissions_to_tape.py
 
@@ -9,6 +9,7 @@ listed and the `et_put.py` command is called to write these files to elastic
 tape. Each file in the submission is updated to include the tape URL in the
 elastic tape system.
 """
+from __future__ import unicode_literals, division, absolute_import
 import argparse
 import logging.config
 import os

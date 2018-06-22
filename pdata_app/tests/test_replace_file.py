@@ -1,6 +1,8 @@
 """
 test_replace_file.py - unit tests for pdata_app.utils.replace_file.py
 """
+from __future__ import unicode_literals, division, absolute_import
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from pdata_app.models import (ActivityId, Checksum, ClimateModel, DataFile,
@@ -126,7 +128,7 @@ class TestReplaceFile(TestCase):
     def test_checksum_copied(self):
         first_file = DataFile.objects.get(name='file_one.nc')
         checksum = Checksum.objects.create(checksum_value='1234',
-                                           checksum_type=u'ADLER32',
+                                           checksum_type='ADLER32',
                                            data_file=first_file)
 
         one_file = DataFile.objects.filter(name='file_one.nc')

@@ -2,6 +2,8 @@
 validate_obs.py - contains common code for when creating observational
 data sets
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import datetime
 import json
 import logging

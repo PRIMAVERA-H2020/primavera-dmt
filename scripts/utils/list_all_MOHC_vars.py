@@ -1,10 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 list_all_MOHC_vars.py
 
 This script will generate a summary of the all of the HighResMIP
 variables that MOHC are planning on generating.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import logging.config
 import sys

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.models import User

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 submit_validation.py
 
@@ -6,7 +6,9 @@ This script is run by a cron job. It checks the ownership of the files in
 DataSubmissions with a status of PENDING_PROCESSING and if they are all now
 owned by the administrator then it submits a LOTUS job to run the validation.
 """
-from __future__ import print_function
+from __future__ import (unicode_literals, division, absolute_import,
+                        print_function)
+
 import os
 import pwd
 import stat

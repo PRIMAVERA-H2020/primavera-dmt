@@ -1,10 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
 prepopulate_db.py
 
 This script is run by the data manager to populate the database with the
 expected climate models, experiments, etc.
 """
+from __future__ import unicode_literals, division, absolute_import
+
 import django
 django.setup()
 
