@@ -2,9 +2,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import datetime
 try:
-    from urllib.parse import urlencode
+    from urllib.parse import urlencode  # Python 3
 except ImportError:
-    from urllib.parse import urlencode
+    from urllib import urlencode  # Python 2.7
 
 from django.db.models import Count, Sum
 from django.template.defaultfilters import filesizeformat

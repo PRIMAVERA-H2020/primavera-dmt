@@ -459,8 +459,8 @@ class TestDataIssue(TestCase):
 
     def test_unicode(self):
         data_issue = models.DataIssue.objects.first()
-        six.assertRegex(str(data_issue),
-            r'Data Issue \([0-9 :-]{19}\): test \(me\)')
+        six.assertRegex(self, str(data_issue),
+                        r'Data Issue \([0-9 :-]{19}\): test \(me\)')
 
 
 class TestChecksum(TestCase):

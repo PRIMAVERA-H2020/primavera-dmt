@@ -163,7 +163,7 @@ class TestIsSameGws(TestCase):
         path1 = 'primavera1/some/dir'
         path2 = '/group_workspaces/jasmin2/primavera2/some/dir'
 
-        six.assertRaisesRegex(RuntimeError, 'Cannot determine group '
+        six.assertRaisesRegex(self, RuntimeError, 'Cannot determine group '
             'workspace name from primavera1/some/dir', is_same_gws,
                                 path1, path2)
 
@@ -171,7 +171,7 @@ class TestIsSameGws(TestCase):
         path1 = '/group_workspaces/jasmin2/primavera2/some/dir'
         path2 = '/group_workspaces/jasmin1/primavera1/some/dir'
 
-        six.assertRaisesRegex(RuntimeError, 'Cannot determine group '
+        six.assertRaisesRegex(self, RuntimeError, 'Cannot determine group '
             'workspace name from /group_workspaces/jasmin1/primavera1/some/dir',
                                 is_same_gws, path1, path2)
 
