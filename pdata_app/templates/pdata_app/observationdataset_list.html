@@ -26,16 +26,16 @@
                     <input type="text" class="form-control" name="name" id="name" placeholder="Name" {% if request.GET.name %} value="{{ request.GET.name }}" {% endif %} autofocus>
                 </div>
                 <div class="form-group">
+                    <label class="sr-only" for="url">URL</label>
+                    <input type="text" class="form-control" name="url" id="url" placeholder="URL (in name)" {% if request.GET.url %} value="{{ request.GET.url }}" {% endif %}>
+                </div>
+                <div class="form-group">
                     <label class="sr-only" for="version">Version</label>
                     <input type="text" class="form-control" name="version" id="version" placeholder="Version" {% if request.GET.version %} value="{{ request.GET.version }}" {% endif %}>
                 </div>
                 <div class="form-group">
                     <label class="sr-only" for="variables">Variables</label>
                     <input type="text" class="form-control" name="variables" id="variables" placeholder="Variables" {% if request.GET.variables %} value="{{ request.GET.variables }}" {% endif %}>
-                </div>
-                <div class="form-group">
-                    <label class="sr-only" for="url">URL</label>
-                    <input type="text" class="form-control" name="url" id="url" placeholder="URL" {% if request.GET.url %} value="{{ request.GET.url }}" {% endif %}>
                 </div>
                 <div class="form-group">
                     <label class="sr-only" for="summary">Other Information</label>
