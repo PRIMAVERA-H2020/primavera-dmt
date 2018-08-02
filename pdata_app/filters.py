@@ -27,14 +27,9 @@ def patched_label():
     return locals()
 
 
-# Monkey patch the failing function
-# Raise a warning when the library version is updated so that this code
-# can be removed.
+# Monkey patch the failing function for broken version
 if django_filters.__version__ == '1.1.0':
     django_filters.filters.Filter.label = patched_label
-else:
-    raise NotImplementedError('Only django_filters version 1.1.0 is'
-                              'currently supported.')
 
 
 class DataRequestFilter(django_filters.FilterSet):
