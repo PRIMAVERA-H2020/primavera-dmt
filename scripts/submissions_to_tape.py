@@ -43,7 +43,7 @@ def _run_command(command):
     """
     try:
         cmd_out = subprocess.check_output(command, stderr=subprocess.STDOUT,
-                                          shell=True)
+                                          shell=True).decode('utf-8')
     except subprocess.CalledProcessError as exc:
         msg = ('Command did not complete sucessfully.\ncommmand:\n{}\n'
                'produced error:\n{}'.format(command, exc.output))

@@ -62,7 +62,7 @@ def submit_validation(submission):
     cmd = 'bsub {} {} {} --log-level DEBUG --processes {} {}'.format(
         LOTUS_OPTIONS, PARALLEL_SCRIPT, VALIDATE_SCRIPT, NUM_PROCS_USE_LOTUS,
         submission)
-    bsub_output = subprocess.check_output(cmd, shell=True)
+    bsub_output = subprocess.check_output(cmd, shell=True).decode('utf-8')
     print('Submission: {}'.format(submission))
     print(bsub_output)
 

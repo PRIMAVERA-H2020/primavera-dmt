@@ -439,7 +439,7 @@ def _run_command(command):
     cmd_out = None
     try:
         cmd_out = subprocess.check_output(command, stderr=subprocess.STDOUT,
-                                          shell=True)
+                                          shell=True).decode('utf-8')
     except subprocess.CalledProcessError as exc:
         if exc.returncode == 17:
             pass

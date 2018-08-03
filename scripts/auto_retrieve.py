@@ -63,7 +63,7 @@ def run_retrieve_request(retrieval_id):
                                             STREAM1_DIR,
                                             retrieval_id))
     try:
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True).decode('utf-8')
     except OSError as exc:
         logger.error('Unable to run command:\n{}\n{}'.format(cmd,
                                                              exc.strerror))
