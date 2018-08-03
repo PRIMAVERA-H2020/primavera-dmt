@@ -84,7 +84,7 @@ def _checksum(checksum_method, file_path):
         # checked and this is only called if file_path has been confirmed as
         # being a valid file
         ret_val = check_output("{} '{}'".format(checksum_method, file_path),
-                                shell=True)
+                                shell=True).decode('utf-8')
         # split on white space and return the first part
         checksum = ret_val.split()[0]
     except (CalledProcessError, OSError):
