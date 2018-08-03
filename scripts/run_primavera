@@ -25,7 +25,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DMT_DIR=`readlink -f $DIR/..`
 VAL_DIR=~jseddon/primavera/primavera-val
 
-source ~jseddon/primavera/venvs/django/bin/activate
+export PATH=/group_workspaces/jasmin2/primavera1/tools/miniconda2/bin:$PATH
+. activate py3-6
 
 export DJANGO_SETTINGS_MODULE=pdata_site.settings
 export PYTHONPATH=$DMT_DIR:$VAL_DIR:$PYTHONPATH
