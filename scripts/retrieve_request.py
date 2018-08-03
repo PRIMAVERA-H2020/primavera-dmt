@@ -597,13 +597,20 @@ def main(args):
 
         timeless_files = all_files.filter(start_time__isnull=True)
 
-        data_files = (all_files.exclude(start_time__isnull=True).
-                      filter(start_time__gte=start_float,
-                             end_time__lt=end_float, online=False))
+        if start_float and end_float:
+            data_files = (all_files.exclude(start_time__isnull=True).
+                          filter(start_time__gte=start_float,
+                                 end_time__lt=end_float, online=False))
+        else:
+            data_files = (all_files.exclude(start_time__isnull=True).
+                          filter(online=False))
 
-        tape_urls = [qs['tape_url'] for qs in data_files.values('tape_url')]
+        timeless_tape_urls = [qs['tape_url']
+                              for qs in timeless_files.values('tape_url')]
+        data_tape_urls = [qs['tape_url']
+                          for qs in data_files.values('tape_url')]
 
-        tape_urls = list(set(tape_urls))
+        tape_urls = list(set(timeless_tape_urls + data_tape_urls))
         tape_urls.sort()
 
         for tape_url in tape_urls:
@@ -623,8 +630,11 @@ def main(args):
     # check that all files were restored
     offline_files = data_req.datafile_set.filter(online=False)
     missed_timeless_files = offline_files.filter(start_time__isnull=True)
-    missed_data_files = (offline_files.exclude(start_time__isnull=True).
-        filter(start_time__gte=start_float, end_time__lt=end_float))
+    if start_float and end_float:
+        missed_data_files = (offline_files.exclude(start_time__isnull=True).
+            filter(start_time__gte=start_float, end_time__lt=end_float))
+    else:
+        missed_data_files = offline_files.exclude(start_time__isnull=True)
 
     if missed_timeless_files or missed_data_files:
         _email_admin_failure(retrieval)
