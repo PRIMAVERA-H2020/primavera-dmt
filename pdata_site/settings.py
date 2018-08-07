@@ -12,11 +12,11 @@ from __future__ import unicode_literals, division, absolute_import
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
 # Now import local settings (that might override DEBUG settings)
 from .settings_local import *
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
 
 # Application definition
 
