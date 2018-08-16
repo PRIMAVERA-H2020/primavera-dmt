@@ -4,7 +4,6 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from pdata_app.forms import SetPasswordBootstrapForm
 import pdata_app.views
-import et_indexer.views
 
 from django.contrib import admin
 
@@ -103,15 +102,6 @@ urlpatterns = [
 
     url(r'^observation_files/$',
         pdata_app.views.ObservationFileList.as_view(), name='obs_files'),
-
-    url(r'^et_indexer/$', et_indexer.views.view_home, name='et_indexer'),
-
-    url(r'^et_indexer/datafiles/$', et_indexer.views.DatafileList.as_view(),
-        name='et_indexer_view_datafiles'),
-
-    url(r'^et_indexer/var_query/$',
-        et_indexer.views.VariableOccurrenceList.as_view(),
-        name='et_indexer_view_varquery'),
 
     url(r'.*', pdata_app.views.view_home, name='home'),
 ]

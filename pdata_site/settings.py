@@ -29,7 +29,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'solo',
     'pdata_app',
-    'et_indexer',
     'django_tables2',
     'django_filters'
 )
