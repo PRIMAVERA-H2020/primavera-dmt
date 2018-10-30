@@ -4,7 +4,7 @@
 # It takes a single parameter, which is the name of the file.
 
 # Check if file exists
-if [ ! -a $1 ]; then
+if [ ! -f $1 ]; then
     echo 'File does not exist ' $1 >&2
     exit 1
 fi
@@ -14,7 +14,7 @@ if grep -q '01.00.21' <<< `ncdump -h $1`; then
     TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/primavera_1.00.21/Tables
 elif grep -q '01.00.23' <<< `ncdump -h $1`; then
     TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/primavera_1.00.23/Tables
-else;
+else
     echo 'data_specs_version not known in ' $1 >&2
     exit 1
 fi
