@@ -16,6 +16,7 @@ from netCDF4 import Dataset
 import os
 import re
 import shutil
+import subprocess
 import sys
 import time
 
@@ -577,7 +578,7 @@ def run_prepare(data_sub, num_processes):
         p.start()
 
     file_paths = [os.path.join(df.directory, df.name)
-                  for df in ds.datafile_set.all()]
+                  for df in data_sub.datafile_set.all()]
 
     for item in itertools.chain(file_paths, (None,) * num_processes):
         params.put(item)
@@ -589,7 +590,7 @@ def run_prepare(data_sub, num_processes):
         raise SubmissionError()
 
 
-def _run_prepare(params, error_event):
+def _run_prepare(params, file_failed):
     """
     Check a single file with PrePARE. This function is called in parallel by
     multiprocessing.
@@ -597,7 +598,7 @@ def _run_prepare(params, error_event):
     :param multiprocessing.Manager.Queue params: A queue, with each item being a
         tuple of the filename to load, the name of the project and the netCDF
         file CMOR version
-    :param multiprocessing.Manager.Event error_event: If set then a catastrophic
+    :param multiprocessing.Manager.Event file_failed: If set then a catastrophic
         error has occurred in another process and processing should end
     """
     while True:
@@ -606,8 +607,18 @@ def _run_prepare(params, error_event):
         if file_path is None:
             return
 
+        prepare_script = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'run_prepare.sh'
+        )
 
+        prep_res = subprocess.run([prepare_script, file_path],
+                                  stdout=subprocess.PIPE)
 
+        if prep_res.returncode:
+            logger.error('File {} failed PrePARE\n{}'.
+                         format(file_path, prep_res.stdout.decode('utf-8')))
+            file_failed.set()
 
 
 def _get_submission_object(submission_dir):
@@ -807,7 +818,6 @@ def main(args):
             try:
                 if not args.no_prepare:
                     run_prepare(data_sub)
-
                 validated_metadata = list(identify_and_validate(data_files,
                     args.mip_era, args.processes, args.file_format))
             except SubmissionError:

@@ -19,6 +19,7 @@ else
     exit 1
 fi
 
+# Set-up the environment and run PrePARE
 export PATH=/group_workspaces/jasmin2/primavera1/tools/miniconda2/bin:$PATH
 source activate cmor
 
