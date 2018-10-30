@@ -555,14 +555,14 @@ def add_tape_url(metadata, tape_base_url, submission_dir):
         data_file['tape_url'] = tape_base_url + '/' + rel_dir
 
 
-def run_prepare(data_sub, num_processes):
+def run_prepare(file_paths, num_processes):
     """
     Run PrePARE on each file in the submission. Any failures are reported
     as an error with the logging and an exception is raised at the end of
     processing if one or more files has failed.
 
-    :param pdata_app.models.DataSubmission data_sub: The data submission to
-        check.
+    :param list file_paths: The paths of the files in the submission's
+        directory.
     :param int num_processes: The number of processes to use in parallel.
     :raises SubmissionError: at the end of checking if one or more files has
     failed PrePARE's checks.
@@ -576,9 +576,6 @@ def run_prepare(data_sub, num_processes):
                                                              file_failed))
         jobs.append(p)
         p.start()
-
-    file_paths = [os.path.join(df.directory, df.name)
-                  for df in data_sub.datafile_set.all()]
 
     for item in itertools.chain(file_paths, (None,) * num_processes):
         params.put(item)
@@ -817,7 +814,7 @@ def main(args):
 
             try:
                 if not args.no_prepare:
-                    run_prepare(data_sub)
+                    run_prepare(data_files)
                 validated_metadata = list(identify_and_validate(data_files,
                     args.mip_era, args.processes, args.file_format))
             except SubmissionError:
