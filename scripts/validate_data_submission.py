@@ -567,13 +567,13 @@ def run_prepare(file_paths, num_processes):
     :raises SubmissionError: at the end of checking if one or more files has
     failed PrePARE's checks.
     """
+    logger.debug('Starting PrePARE on {} files'.format(len(file_paths)))
     jobs = []
     manager = Manager()
     params = manager.Queue()
     file_failed = manager.Event()
     for i in range(num_processes):
-        p = Process(target=identify_and_validate_file, args=(params,
-                                                             file_failed))
+        p = Process(target=_run_prepare, args=(params, file_failed))
         jobs.append(p)
         p.start()
 
@@ -584,7 +584,10 @@ def run_prepare(file_paths, num_processes):
         j.join()
 
     if file_failed.is_set():
+        logger.error('Not all files passed PrePARE')
         raise SubmissionError()
+
+    logger.debug('All files successfully checked by PrePARE')
 
 
 def _run_prepare(params, file_failed):
@@ -814,7 +817,7 @@ def main(args):
 
             try:
                 if not args.no_prepare:
-                    run_prepare(data_files)
+                    run_prepare(data_files, args.processes)
                 validated_metadata = list(identify_and_validate(data_files,
                     args.mip_era, args.processes, args.file_format))
             except SubmissionError:
