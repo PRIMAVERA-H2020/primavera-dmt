@@ -554,6 +554,62 @@ def add_tape_url(metadata, tape_base_url, submission_dir):
         data_file['tape_url'] = tape_base_url + '/' + rel_dir
 
 
+def run_prepare(data_sub, num_processes):
+    """
+    Run PrePARE on each file in the submission. Any failures are reported
+    as an error with the logging and an exception is raised at the end of
+    processing if one or more files has failed.
+
+    :param pdata_app.models.DataSubmission data_sub: The data submission to
+        check.
+    :param int num_processes: The number of processes to use in parallel.
+    :raises SubmissionError: at the end of checking if one or more files has
+    failed PrePARE's checks.
+    """
+    jobs = []
+    manager = Manager()
+    params = manager.Queue()
+    file_failed = manager.Event()
+    for i in range(num_processes):
+        p = Process(target=identify_and_validate_file, args=(params,
+                                                             file_failed))
+        jobs.append(p)
+        p.start()
+
+    file_paths = [os.path.join(df.directory, df.name)
+                  for df in ds.datafile_set.all()]
+
+    for item in itertools.chain(file_paths, (None,) * num_processes):
+        params.put(item)
+
+    for j in jobs:
+        j.join()
+
+    if file_failed.is_set():
+        raise SubmissionError()
+
+
+def _run_prepare(params, error_event):
+    """
+    Check a single file with PrePARE. This function is called in parallel by
+    multiprocessing.
+
+    :param multiprocessing.Manager.Queue params: A queue, with each item being a
+        tuple of the filename to load, the name of the project and the netCDF
+        file CMOR version
+    :param multiprocessing.Manager.Event error_event: If set then a catastrophic
+        error has occurred in another process and processing should end
+    """
+    while True:
+        file_path = params.get()
+
+        if file_path is None:
+            return
+
+
+
+
+
 def _get_submission_object(submission_dir):
     """
     :param str submission_dir: The path of the submission's top level
@@ -711,6 +767,8 @@ def parse_args():
         'create a submission when all files pass validation)', action='store_true')
     parser.add_argument('-v', '--validate_only', help='only validate the input, '
         'do not create a data submission', action='store_true')
+    parser.add_argument('-n', '--no-prepare', help="don't run PrePARE",
+                        action='store_true')
     parser.add_argument('--version', action='version',
         version='%(prog)s {}'.format(__version__))
     args = parser.parse_args()
@@ -747,6 +805,9 @@ def main(args):
                     raise SubmissionError(msg)
 
             try:
+                if not args.no_prepare:
+                    run_prepare(data_sub)
+
                 validated_metadata = list(identify_and_validate(data_files,
                     args.mip_era, args.processes, args.file_format))
             except SubmissionError:
