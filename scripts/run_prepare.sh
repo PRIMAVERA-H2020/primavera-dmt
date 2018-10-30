@@ -4,7 +4,7 @@
 # It takes a single parameter, which is the name of the file.
 
 # Check if file exists
-if [ ! -a FILE ]; then
+if [ ! -a $1 ]; then
     echo 'File does not exist ' $1 >&2
     exit 1
 fi
