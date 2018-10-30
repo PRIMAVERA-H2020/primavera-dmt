@@ -595,11 +595,10 @@ def _run_prepare(params, file_failed):
     Check a single file with PrePARE. This function is called in parallel by
     multiprocessing.
 
-    :param multiprocessing.Manager.Queue params: A queue, with each item being a
-        tuple of the filename to load, the name of the project and the netCDF
-        file CMOR version
-    :param multiprocessing.Manager.Event file_failed: If set then a catastrophic
-        error has occurred in another process and processing should end
+    :param multiprocessing.Manager.Queue params: A queue, with each item being
+        the full path of a file in the submission to check.
+    :param multiprocessing.Manager.Event file_failed: If set then one or more
+        files has failed validation.
     """
     while True:
         file_path = params.get()
