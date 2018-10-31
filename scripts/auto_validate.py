@@ -164,8 +164,8 @@ def main():
     for submission in submissions:
         if not are_files_chowned(submission):
             logger.debug('Skipping {} as all files not owned by {}.'.
-                    format(submission.incoming_directory,
-                           ADMIN_USER))
+                         format(submission.incoming_directory,
+                                ADMIN_USER))
         else:
             logger.debug('Processing {}'.format(submission))
             submission.status = STATUS_VALUES['ARRIVED']
