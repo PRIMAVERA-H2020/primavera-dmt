@@ -29,7 +29,7 @@ DEFAULT_LOG_FORMAT = '%(levelname)s: %(message)s'
 
 logger = logging.getLogger(__name__)
 
-QUARTER_HOUR = 15 * 60
+ONE_HOUR = 60 * 60
 
 
 def run_write(data_sub):
@@ -100,9 +100,9 @@ def main():
             for ds in data_subs:
                 run_write(ds)
 
-        logger.debug('Waiting for fifteen minutes at {}'.format(
+        logger.debug('Waiting for one hour at {}'.format(
             datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')))
-        sleep(QUARTER_HOUR)
+        sleep(ONE_HOUR)
 
 
 if __name__ == "__main__":
