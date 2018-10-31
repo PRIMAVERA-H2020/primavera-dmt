@@ -19,7 +19,7 @@ import sys
 import django
 django.setup()
 from pdata_app.utils.common import list_files
-from pdata_app.models import DataSubmission
+from pdata_app.models import DataSubmission, Settings
 from vocabs.vocabs import STATUS_VALUES
 
 __version__ = '0.1.0b1'
@@ -31,11 +31,11 @@ logger = logging.getLogger(__name__)
 
 
 STATUS_TO_PROCESS = STATUS_VALUES['PENDING_PROCESSING']
-ADMIN_USER = 'jseddon'
+ADMIN_USER = Settings.get_solo().contact_user_id
 PARALLEL_SCRIPT = ('/home/users/jseddon/primavera/LIVE-prima-dm/scripts/'
                    'parallel_primavera')
 VALIDATE_SCRIPT = 'validate_data_submission.py'
-MAX_VALIDATE_SCRIPTS = 4
+MAX_VALIDATE_SCRIPTS = 3
 NUM_PROCS_USE_LOTUS = 4
 LOTUS_OPTIONS = ('-o ~/lotus/%J.o -q par-multi -n {} -R "span[hosts=1]" '
                  '-W 24:00 -R "rusage[mem=98304.0]" -M 98304'.
@@ -73,7 +73,7 @@ def is_max_jobs_reached(job_name, max_num_jobs):
 
 def are_files_chowned(submission):
     """
-    Check whether all of the netCDF files in the submission's directory are now
+    Check whether all of the files in the submission's directory are now
     owned by the admin user (they will be owned by the submitting user until
     the cron job has chowned them). If there are no files in the directory then
     return false.
@@ -84,7 +84,9 @@ def are_files_chowned(submission):
     """
     file_names = list_files(submission.directory)
 
-    if file_names:
+    if not file_names:
+        return False
+    else:
         for file_name in file_names:
             uid = os.stat(file_name)[stat.ST_UID]
             user_name = pwd.getpwuid(uid)[0]
@@ -110,20 +112,14 @@ def submit_validation(submission_directory):
         '--log-level',
         'DEBUG',
         '--processes',
-        NUM_PROCS_USE_LOTUS,
+        '{}'.format(NUM_PROCS_USE_LOTUS),
         '--version-string',
         VERSION_STRING,
         submission_directory
     ]
 
-    # bsub_out = subprocess.run(cmd, stdout=subprocess.PIPE,
-    #                           stderr=subprocess.PIPE)
-
-    logger.debug(' '.join(cmd))
-    class bsub_out:
-        returncode = 0
-        stderr = 'wibble'
-        stdout = 'wobble'
+    bsub_out = subprocess.run(cmd, stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
 
     if bsub_out.returncode:
         logger.error('Non-zero return code {} from:\n{}\n{}'.
@@ -163,11 +159,18 @@ def main():
 
     submissions = DataSubmission.objects.filter(status=STATUS_TO_PROCESS)
 
+    logger.debug('{} submissions to validate found'.format(submissions.count()))
+
     for submission in submissions:
-        if are_files_chowned(submission):
+        if not are_files_chowned(submission):
+            logger.debug('Skipping {} as all files not owned by {}.'.
+                    format(submission.incoming_directory,
+                           ADMIN_USER))
+        else:
+            logger.debug('Processing {}'.format(submission))
             submission.status = STATUS_VALUES['ARRIVED']
             submission.save()
-            submit_validation(submission.directory)
+            submit_validation(submission.incoming_directory)
 
 
 if __name__ == "__main__":
