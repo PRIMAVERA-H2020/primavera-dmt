@@ -118,7 +118,7 @@ def submit_validation(submission_directory):
         submission_directory
     ]
 
-    logger.debug('Command is:\n{}', ' '.join(cmd))
+    logger.debug('Command is:\n{}'.format(' '.join(cmd)))
 
     bsub_out = subprocess.run(cmd, stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE)
