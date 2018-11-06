@@ -1,9 +1,7 @@
 #!/bin/bash
 #BSUB -o /home/users/jseddon/lotus/%J.o
 #BSUB -e /home/users/jseddon/lotus/%J.e
-#BSUB -q par-single
-#BSUB -W 05:00
-#BSUB -n 8
+#BSUB -q par-multi
 #BSUB -R "span[hosts=1]"
 #
 # SYNOPSIS
@@ -14,8 +12,7 @@
 #
 #   This script is a thin shell wrapper around Python scripts. All options are
 #   passed through to the Python script after some initialisation has been
-#   performed. This script requests a LOTUS job that use 8 cores on a single
-#   host.
+#   performed. This script requests a LOTUS job on a single host.
 #
 # OPTIONS
 #
@@ -46,7 +43,7 @@ $DIR/$PYTHON_SCRIPT "$@"
 exit_code=$?
 
 # send an email to indicate completion
-if [ "$PYTHON_SCRIPT" != "send_emails.py" ] && [ "$PYTHON_SCRIPT" != "create_root_chown_list.py" ] && [ "$PYTHON_SCRIPT" != "split_retrieve_request.py" ]; then
+if [ "$PYTHON_SCRIPT" != "send_emails.py" ] && [ "$PYTHON_SCRIPT" != "create_root_chown_list.py" ] && [ "$PYTHON_SCRIPT" != "split_retrieve_request.py" ] && [ "$PYTHON_SCRIPT" != "auto_validate.py" ]; then
     echo "$PYTHON_SCRIPT complete. Sending email."
     $DIR/create_email.py "[PRIMAVERA] $LSB_JOBID finished" "$LSB_JOBNAME has finished"
 fi
