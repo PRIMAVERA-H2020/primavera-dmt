@@ -104,7 +104,7 @@ def submit_validation(submission_directory):
     :param str submission_directory: The full path to the directory to
         validate.
     """
-    cmd = [
+    cmd_cmpts = [
         'bsub',
         LOTUS_OPTIONS,
         PARALLEL_SCRIPT,
@@ -118,10 +118,12 @@ def submit_validation(submission_directory):
         submission_directory
     ]
 
-    logger.debug('Command is:\n{}'.format(' '.join(cmd)))
+    cmd = ' '.join(cmd_cmpts)
+
+    logger.debug('Command is:\n{}'.format(cmd))
 
     bsub_out = subprocess.run(cmd, stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE)
+                              stderr=subprocess.PIPE, shell=True)
 
     if bsub_out.returncode:
         logger.error('Non-zero return code {} from:\n{}\n{}'.
