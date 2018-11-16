@@ -162,7 +162,8 @@ def main():
         logger.debug('Maximum number of jobs reached.')
         sys.exit(0)
 
-    submissions = DataSubmission.objects.filter(status=STATUS_TO_PROCESS)
+    submissions = (DataSubmission.objects.filter(status=STATUS_TO_PROCESS).
+                   order_by('id'))
 
     logger.debug('{} submissions to validate found'.format(submissions.count()))
 
