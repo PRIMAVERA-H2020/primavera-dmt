@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 """
-update_dreqs_0119.py
+fix_failed_et.py
 
-One large elastic tape retrieval failed when the server had to be rebooted
-80% of the way through a large retrieval. This script identfies files in this
+Elastic tape retrievals occasionally fail when a significant way through a
+large retrieval. This script identfies files in this specified
 retrieval, checks their checksum and if they are fine then copies them into
-teh DRS directory structure (hardcoded to primavera5 and so no symbolic links
-are required) and updates the file's status in the DMT.
+the DRS directory structure and updates the file's status in the DMT.
 """
 import argparse
 import logging.config
@@ -16,7 +15,8 @@ import sys
 import django
 django.setup()
 from pdata_app.models import DataFile, Settings
-from pdata_app.utils.common import adler32, construct_drs_path, ilist_files
+from pdata_app.utils.common import (adler32, construct_drs_path,
+                                    get_gws_any_dir, ilist_files)
 
 __version__ = '0.1.0b'
 
@@ -64,7 +64,8 @@ def main(args):
                            format(found_name))
             continue
 
-        dest_dir = os.path.join(base_dir, construct_drs_path(data_file))
+        dest_dir = os.path.join(get_gws_any_dir(extracted_file), 'stream1',
+                                construct_drs_path(data_file))
         dest_path = os.path.join(dest_dir, found_name)
         if os.path.exists(dest_path):
             logger.warning('Skipping {} as it already exists at {}'.
@@ -75,6 +76,13 @@ def main(args):
             os.makedirs(dest_dir)
 
         os.rename(extracted_file, dest_path)
+
+        # create a link from the base dir
+        link_dir = os.path.join(base_dir, construct_drs_path(data_file))
+        link_path = os.path.join(link_dir, data_file.name)
+        if not  os.path.exists(link_dir):
+            os.makedirs(link_dir)
+        os.symlink(dest_path, link_path)
 
         data_file.online = True
         data_file.directory = dest_dir

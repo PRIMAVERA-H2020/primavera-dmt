@@ -18,7 +18,8 @@ from pdata_app import models
 from pdata_app.utils.common import (make_partial_date_time,
                                     standardise_time_unit,
                                     calc_last_day_in_month, pdt2num,
-                                    is_same_gws, get_gws, construct_drs_path,
+                                    is_same_gws, get_gws, get_gws_any_dir,
+                                    construct_drs_path,
                                     construct_filename,
                                     construct_cylc_task_name,
                                     construct_time_string, get_request_size,
@@ -215,6 +216,26 @@ class TestGetGws(TestCase):
         path = '/rabbits'
 
         self.assertRaises(RuntimeError, get_gws, path)
+
+
+class TestGetGwsAnyDir(TestCase):
+    """Test pdata_app.utils.common.get_gws_any_dir()"""
+    def test_gws1(self):
+        path = '/gws/nopw/j04/primavera1/stream1/drs/path/blah'
+
+        self.assertEqual(get_gws_any_dir(path),
+                         '/gws/nopw/j04/primavera1')
+
+    def test_any_dir(self):
+        path = '/gws/nopw/j04/primavera9/drs/path/blah'
+
+        self.assertEqual(get_gws_any_dir(path),
+                         '/gws/nopw/j04/primavera9')
+
+    def test_anything_else(self):
+        path = '/rabbits'
+
+        self.assertRaises(RuntimeError, get_gws_any_dir, path)
 
 
 class TestConstructDrsPath(TestCase):

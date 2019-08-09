@@ -330,6 +330,25 @@ def get_gws(path):
     return gws.group(0)
 
 
+def get_gws_any_dir(path):
+    """
+    Find the group workspace path at the start any path.
+
+    :param str path:
+    :returns: the path identified
+    :rtype: str
+    :raises RuntimeError: if the the path isn't a gws path
+    """
+    gws_pattern = r'^/gws/nopw/j04/primavera\d'
+    gws = re.match(gws_pattern, path)
+
+    if not gws:
+        msg = 'Cannot determine group workspace name from {}'.format(path)
+        raise RuntimeError(msg)
+
+    return gws.group(0)
+
+
 def construct_drs_path(data_file):
     """
     Make the CMIP6 DRS directory path for the specified file.

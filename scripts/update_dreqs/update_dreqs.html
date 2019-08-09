@@ -591,13 +591,6 @@ This script copies the data from its current directory to the test area.
 
 THIS SCRIPT SHOULD NOT BE RUN AGAINST THE LIVE DATABASE!!!
 </td></tr>
-<tr><td>update_dreqs_0119.py</td><td>
-One large elastic tape retrieval failed when the server had to be rebooted
-80% of the way through a large retrieval. This script identfies files in this
-retrieval, checks their checksum and if they are fine then copies them into
-teh DRS directory structure (hardcoded to primavera5 and so no symbolic links
-are required) and updates the file's status in the DMT.
-</td></tr>
 <tr><td>update_dreqs_0120.py</td><td>
 This file adds data requests for mrsol for the r1i1p2f1 EC-Earth3P-HR hist-1950
 experiment.
@@ -937,6 +930,10 @@ contributions to WP5.
 </td></tr>
 <tr><td>update_dreqs_0209.py</td><td>
 This moves the files in two duplicate data submissions to replaced files.
+</td></tr>
+<tr><td>update_dreqs_0210.py</td><td>
+This file creates an additional data request for the ECMWF contribution to WP5
+for evspsbl_Amon, [uv]o_Omon.
 </td></tr>
 
 </table>
