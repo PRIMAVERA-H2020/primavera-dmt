@@ -87,6 +87,7 @@ def main(args):
         'PrimSIday',
         'Prim6hr',
         'Prim6hrPt',
+        'PrimO6hr',
         'Prim3hr',
         'Prim3hrPt',
         'Prim1hr',
