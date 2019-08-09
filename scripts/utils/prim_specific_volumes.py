@@ -24,17 +24,19 @@ DEFAULT_LOG_FORMAT = '%(levelname)s: %(message)s'
 
 logger = logging.getLogger(__name__)
 
+
 def parse_args():
     """
     Parse command-line arguments
     """
-    parser = argparse.ArgumentParser(description='Write to file the total volume '
-                                                 'of data for the HadGEM3-GC31 models.')
+    parser = argparse.ArgumentParser(description='Write to file the volume of '
+                                                 'PRIMAVERA specific data.')
     parser.add_argument('filepath', help='the file path to write to')
     parser.add_argument('-l', '--log-level', help='set logging level to one of '
-        'debug, info, warn (the default), or error')
+                                                  'debug, info, warn (the '
+                                                  'default), or error')
     parser.add_argument('--version', action='version',
-        version='%(prog)s {}'.format(__version__))
+                        version='%(prog)s {}'.format(__version__))
     args = parser.parse_args()
 
     return args
@@ -112,23 +114,27 @@ def main(args):
                                  k[2],
                                  table_order.index(k[3])))
 
-    for upload in uploaded:
-        data_reqs = DataRequest.objects.filter(
-            climate_model__short_name=upload[0],
-            experiment__short_name=upload[1],
-            rip_code=upload[2],
-            variable_request__table_name=upload[3],
-            datafile__isnull=False
-        )
-        total_volume = 0
-        for dr in data_reqs.distinct():
-            total_volume += dr.datafile_set.aggregate(Sum('size'))['size__sum']
-        if upload[0].startswith('HadGEM'):
-            institute = '*'
-        else:
-            institute = data_reqs.first().institute.short_name
-        print(f'PRIMAVERA/HighResMIP/{institute}/{upload[0]}/{upload[1]}/'
-              f'{upload[2]}/{upload[3]} {total_volume}')
+    with open(args.filepath, 'w') as fh:
+        for upload in uploaded:
+            data_reqs = DataRequest.objects.filter(
+                climate_model__short_name=upload[0],
+                experiment__short_name=upload[1],
+                rip_code=upload[2],
+                variable_request__table_name=upload[3],
+                datafile__isnull=False
+            )
+            total_volume = 0
+            for dr in data_reqs.distinct():
+                total_volume += (dr.datafile_set.aggregate(Sum('size'))
+                                 ['size__sum'])
+                total_volume *= 1.1  # Add a fudge factor of 10%
+                total_volume /= 1024**4  # Convert bytes to tebibytes
+            if upload[0].startswith('HadGEM'):
+                institute = '*'
+            else:
+                institute = data_reqs.first().institute.short_name
+            fh.write(f'PRIMAVERA/HighResMIP/{institute}/{upload[0]}/'
+                     f'{upload[1]}/{upload[2]}/{upload[3]} {total_volume}\n')
 
 
 if __name__ == "__main__":
