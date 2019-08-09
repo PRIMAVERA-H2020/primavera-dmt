@@ -8,14 +8,11 @@ variables in the format required by the CREPP system.
 from __future__ import unicode_literals, division, absolute_import
 
 import argparse
-from collections import OrderedDict
-from copy import copy
 import logging.config
 import sys
 
 import django
 from django.db.models import Sum
-from django.template.defaultfilters import filesizeformat
 django.setup()
 from pdata_app.models import DataRequest
 
@@ -74,7 +71,7 @@ def main(args):
     experiment_order = [
         'highresSST-present',
         'highresSST-future',
-        'spinup-1950'
+        'spinup-1950',
         'hist-1950',
         'control-1950',
         'highres-future'
@@ -83,7 +80,7 @@ def main(args):
     table_order = [
         'Primmon',
         'PrimmonZ',
-        'PrimOmon'
+        'PrimOmon',
         'Primday',
         'PrimdayPt',
         'PrimOday',
@@ -112,20 +109,25 @@ def main(args):
     uploaded.sort(key=lambda k: (model_order.index(k[0]),
                                  experiment_order.index(k[1]),
                                  k[2],
-                                 table_order.index(k[2])))
+                                 table_order.index(k[3])))
 
     for upload in uploaded:
-        data_req = DataRequest.objects.filter(
+        data_reqs = DataRequest.objects.filter(
             climate_model__short_name=upload[0],
             experiment__short_name=upload[1],
             rip_code=upload[2],
             variable_request__table_name=upload[3],
             datafile__isnull=False
         )
-        print(f'{}')
-
-
-
+        total_volume = 0
+        for dr in data_reqs:
+            total_volume += dr.datafile_set.aggregate(Sum('size'))['size__sum']
+        if upload[0].startswith('HadGEM'):
+            institute = '*'
+        else:
+            institute = data_reqs.first().institute.short_name
+        print(f'PRIMAVERA/HighResMIP/{institute}/{upload[0]}/{upload[1]}/'
+              f'{upload[2]}/{upload[3]} {total_volume}')
 
 
 if __name__ == "__main__":
