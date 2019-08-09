@@ -121,7 +121,7 @@ def main(args):
             datafile__isnull=False
         )
         total_volume = 0
-        for dr in data_reqs:
+        for dr in data_reqs.distinct():
             total_volume += dr.datafile_set.aggregate(Sum('size'))['size__sum']
         if upload[0].startswith('HadGEM'):
             institute = '*'
