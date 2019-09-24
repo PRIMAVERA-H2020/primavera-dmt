@@ -47,13 +47,15 @@ def main(args):
     Main entry point
     """
     dreqs = DataRequest.objects.filter(
-        climate_model__short_name__in=['MPI-ESM1-2-HR'], #'MPI-ESM1-2-XR'],
-        experiment__short_name='highresSST-present',
-        variable_request__table_name='Amon',
-        variable_request__cmor_name='tasmax',
+        climate_model__short_name__in=['MPI-ESM1-2-HR', 'MPI-ESM1-2-XR'],
+        experiment__short_name='highresSST-present'
     ).exclude(
         climate_model__short_name='MPI-ESM1-2-XR',
         variable_request__cmor_name__in=['hus7h', 'ta7h', 'ua7h']
+    ).exclude(
+        climate_model__short_name='MPI-ESM1-2-HR',
+        variable_request__table_name='Amon',
+        variable_request__cmor_name__in=['tas', 'tasmax'],
     )
 
     logger.debug(f'Found {dreqs.count()} data requests')
