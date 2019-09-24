@@ -47,6 +47,9 @@ def main(args):
         experiment__short_name='highresSST-present',
         variable_request__table_name='Amon',
         variable_request__cmor_name='tas',
+    ).exclude(
+        climate_model__short_name='MPI-ESM1-2-XR',
+        variable_request__cmor_name__in=['hus7h', 'ta7h', 'ua7h']
     )
 
     for dreq in dreqs:
