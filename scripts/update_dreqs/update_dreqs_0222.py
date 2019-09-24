@@ -46,7 +46,7 @@ def main(args):
 
     logger.debug(f'Found {esgfs.count()} datasets')
 
-    # esgfs.update(status='CREATED')
+    esgfs.update(status='CREATED')
 
 
 if __name__ == "__main__":
