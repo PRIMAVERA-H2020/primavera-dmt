@@ -2,7 +2,8 @@
 """
 update_dreqs_0223.py
 
-Identify variables that have a different out_name to cmor_name
+Identify variables that have a different out_name to cmor_name and save these
+to the DMT's VariableRequest table.
 """
 import argparse
 import json
@@ -62,6 +63,8 @@ def main(args):
                              f'{table_name}')
                 continue
             if not (out_name == cmor_name):
+                var_req.out_name = out_name
+                var_req.save()
                 print(f'{cmor_name}_{table_name} {out_name}')
 
 
