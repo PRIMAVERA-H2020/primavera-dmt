@@ -170,6 +170,8 @@ class VariableRequest(models.Model):
                                   verbose_name='Cell Measures')
     uid = models.CharField(max_length=200, null=False, blank=False,
                                   verbose_name='UID')
+    out_name = models.CharField(max_length=20, null=True, blank=False,
+                                  verbose_name='Output Name')
 
     def __str__(self):
         return 'VariableRequest: {} ({})'.format(self.cmor_name, self.table_name)
