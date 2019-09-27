@@ -23,7 +23,8 @@ DEFAULT_LOG_FORMAT = '%(levelname)s: %(message)s'
 logger = logging.getLogger(__name__)
 
 
-MIP_TABLE_DIR = '/home/h04/jseddon/primavera/cmip6-cmor-tables/Tables'
+MIP_TABLE_DIR = ('/home/users/jseddon/primavera/original-cmor-tables/'
+                 'primavera_1.00.23/Tables')
 
 
 def parse_args():
