@@ -381,7 +381,8 @@ class TestESGFDatasetMethods(TestCase):
             standard_name='var_name', cell_methods='time:mean',
             positive='optimistic', variable_type=VARIABLE_TYPES['real'],
             dimensions='massive', cmor_name='var1', modeling_realm='atmos',
-            frequency=FREQUENCY_VALUES['ann'], cell_measures='', uid='123abc'
+            frequency=FREQUENCY_VALUES['ann'], cell_measures='', uid='123abc',
+            out_name='var'
         )
         data_req = get_or_create(
             models.DataRequest, project=proj, institute=inst,
@@ -405,12 +406,28 @@ class TestESGFDatasetMethods(TestCase):
         self.esgf_ds = get_or_create(models.ESGFDataset, status=u'CREATED',
             version='v20160720', data_request=data_req)
 
+    def test_drs_id(self):
+        full_id = self.esgf_ds.drs_id
+        expected = ('CMIP6.HighResMIP.MOHC.Model-1.control-1950.r1i1p1f1.'
+                    'Amon.var1.gn')
+        self.assertEqual(full_id, expected)
+
+    def test_drs_id_out_name(self):
+        full_id = self.esgf_ds.get_drs_id(use_out_name=True)
+        expected = ('CMIP6.HighResMIP.MOHC.Model-1.control-1950.r1i1p1f1.'
+                    'Amon.var.gn')
+        self.assertEqual(full_id, expected)
+
     def test_get_full_id(self):
         full_id = self.esgf_ds.get_full_id()
-
         expected = ('CMIP6.HighResMIP.MOHC.Model-1.control-1950.r1i1p1f1.'
                     'Amon.var1.gn.v20160720')
+        self.assertEqual(full_id, expected)
 
+    def test_get_full_id_with_out_name(self):
+        full_id = self.esgf_ds.get_full_id(use_out_name=True)
+        expected = ('CMIP6.HighResMIP.MOHC.Model-1.control-1950.r1i1p1f1.'
+                    'Amon.var.gn.v20160720')
         self.assertEqual(full_id, expected)
 
     def test_clean_version(self):

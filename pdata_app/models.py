@@ -446,10 +446,28 @@ class ESGFDataset(DataFileAggregationBase):
         :returns: the DRS id
         :rtype: str
         """
+        return self.get_drs_id()
+
+    def get_drs_id(self, use_out_name=False):
+        """
+        Generate the DRS id from the data request.
+
+        :param bool use_out_name: Use out_name if it exists, otherwise use
+            cmor_name.
+        :returns: the DRS id
+        :rtype: str
+        """
         if self.data_request.datafile_set.count() == 0:
             raise ValueError('ESGFDataSet from {} has no DataFiles.'.format(
                 self.data_request
             ))
+
+        if use_out_name:
+            out_name = self.data_request.variable_request.out_name
+            cmor_name = (out_name if out_name else
+                         self.data_request.variable_request.cmor_name)
+        else:
+            cmor_name = self.data_request.variable_request.cmor_name
 
         components = [
             self.data_request.project.short_name,
@@ -461,16 +479,18 @@ class ESGFDataset(DataFileAggregationBase):
             self.data_request.experiment.short_name,
             self.data_request.rip_code,
             self.data_request.variable_request.table_name,
-            self.data_request.variable_request.cmor_name,
+            cmor_name,
             self.data_request.datafile_set.values('grid').first()['grid']
         ]
         return '.'.join(components)
 
-    def get_full_id(self):
+    def get_full_id(self, use_out_name=False):
         """
         Return full DRS Id made up of drsId version as: drs_id.version
+        :param bool use_out_name: Use out_name if it exists, otherwise use
+            cmor_name.
         """
-        return "%s.%s" % (self.drs_id, self.version)
+        return "%s.%s" % (self.get_drs_id(use_out_name), self.version)
 
     def clean(self, *args, **kwargs):
         if not re.match(r"^v\d+$", self.version):
