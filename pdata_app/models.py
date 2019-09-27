@@ -490,7 +490,8 @@ class ESGFDataset(DataFileAggregationBase):
         :param bool use_out_name: Use out_name if it exists, otherwise use
             cmor_name.
         """
-        return "%s.%s" % (self.get_drs_id(use_out_name), self.version)
+        return "%s.%s" % (self.get_drs_id(use_out_name=use_out_name),
+                          self.version)
 
     def clean(self, *args, **kwargs):
         if not re.match(r"^v\d+$", self.version):
