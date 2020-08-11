@@ -13,7 +13,12 @@ from six.moves import zip_longest
 from six import string_types
 from tempfile import gettempdir
 
-from iris.time import PartialDateTime
+# If Iris isn't available then try
+# https://github.com/PRIMAVERA-H2020/partial_date_time
+try:
+    from iris.time import PartialDateTime
+except ImportError:
+    from partial_date_time import PartialDateTime
 import netcdftime
 import cf_units
 
