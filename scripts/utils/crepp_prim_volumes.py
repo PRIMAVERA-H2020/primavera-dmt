@@ -12,7 +12,7 @@ from pdata_app.models import DataRequest, DataFile  # NOPEP8
 from pdata_app.utils.common import filter_hadgem_stream2  # NOPEP8
 
 
-FILENAME = 'crepp_prim_volumes.csv'
+FILENAME = 'crepp_prim_volumes_ensemble_table.csv'
 
 
 def main():
@@ -54,7 +54,6 @@ def main():
     )).distinct()
 
     ec_earth_s1 = DataRequest.objects.filter(
-        project__short_name='PRIMAVERA',
         institute__short_name='EC-Earth-Consortium',
         experiment__short_name__in=coupled_expts,
         rip_code='r1i1p1f1',
@@ -71,18 +70,24 @@ def main():
 
     unique_expts = (prim_reqs.values_list('institute__short_name',
                                           'climate_model__short_name',
-                                          'experiment__short_name').
+                                          'experiment__short_name',
+                                          'rip_code',
+                                          'variable_request__table_name').
                     distinct().order_by('institute__short_name',
                                         'climate_model__short_name',
-                                        'experiment__short_name'))
+                                        'experiment__short_name',
+                                        'rip_code',
+                                        'variable_request__table_name'))
 
     with open(FILENAME, 'w') as fh:
         fh.write('drs_id, Volume (TB)\n')
-        for inst_name, model_name, expt_name in unique_expts:
+        for inst_name, model_name, expt_name, rip_code, table_name in unique_expts:
             dreqs = prim_reqs.filter(
                 institute__short_name=inst_name,
                 climate_model__short_name=model_name,
-                experiment__short_name=expt_name
+                experiment__short_name=expt_name,
+                rip_code=rip_code,
+                variable_request__table_name=table_name
             )
             if dreqs:
                 dreq_size = (
@@ -95,7 +100,9 @@ def main():
                     f'{df.activity_id.short_name}.'
                     f'{df.institute.short_name}.'
                     f'{df.climate_model.short_name}.'
-                    f'{df.experiment.short_name}'
+                    f'{df.experiment.short_name}.'
+                    f'{df.rip_code}.'
+                    f'{df.variable_request.table_name}'
                 )
                 if 'MPI' in drs_id and 'DCPP' in drs_id:
                     drs_id = (drs_id.replace('DCPP', 'primWP5').
