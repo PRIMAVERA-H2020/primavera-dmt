@@ -12,13 +12,13 @@ PRIMAVERA Data Management Tool
    django-solo  
    django-tables2
    mock
-   netcdftime  
+   cftime  
    iris  
    ```  
    
    For example in Conda:
    ```
-   conda create -n primavera-dmt -c conda-forge python=3.6 django=2.1 django-filter mock netcdftime iris
+   conda create -n primavera-dmt -c conda-forge python=3.6 django=2.2 django-filter mock cftime iris
    source activate primavera-dmt
    pip install django-solo django-tables2
    ```
