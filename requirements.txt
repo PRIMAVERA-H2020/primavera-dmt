@@ -1,0 +1,7 @@
+django
+django-filter
+django-solo
+django-tables2
+mock
+netcdftime
+partial-date-time
