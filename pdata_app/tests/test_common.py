@@ -9,7 +9,10 @@ try:
 except ImportError:
     import mock
 
-from iris.time import PartialDateTime
+try:
+    from iris.time import PartialDateTime
+except ImportError:
+    from partial_date_time import PartialDateTime
 from numpy.testing import assert_almost_equal
 
 from django.test import TestCase
