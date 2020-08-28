@@ -19,7 +19,7 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
   - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
-      conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy=1.15 scipy=1.1 iris=2.2 netcdf4=1.4 matplotlib=2.2 netcdftime mock filelock pytest psycopg2 django=2.1 django-filter;
+      conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy=1.15 scipy=1.1 iris=2.2 netcdf4=1.4 matplotlib=2.2 netcdftime mock filelock pytest psycopg2 django=2.2 django-filter;
     fi
   - source activate test-environment
   - pip install django-solo
