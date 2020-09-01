@@ -192,6 +192,11 @@ class ESGFDatasetFilter(django_filters.FilterSet):
         lookup_expr='icontains'
     )
 
+    rip_code = django_filters.CharFilter(
+        field_name='data_request__rip_code',
+        lookup_expr='icontains'
+    )
+
     mip_table = django_filters.CharFilter(
         field_name='data_request__variable_request__table_name',
         lookup_expr='icontains'

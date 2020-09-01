@@ -41,6 +41,10 @@
                     <input type="text" class="form-control" name="experiment" id="experiment" placeholder="Experiment" {% if request.GET.experiment %} value="{{ request.GET.experiment }}" {% endif %}>
                 </div>
                 <div class="form-group">
+                    <label class="sr-only" for="rip_code">Project</label>
+                    <input type="text" class="form-control" name="rip_code" id="rip_code" placeholder="Variant Label" {% if request.GET.rip_code %} value="{{ request.GET.rip_code }}" {% endif %}>
+                </div>
+                <div class="form-group">
                     <label class="sr-only" for="mip_table">MIP Table</label>
                     <input type="text" class="form-control" name="mip_table" id="mip_table" placeholder="MIP Table" {% if request.GET.mip_table %} value="{{ request.GET.mip_table }}" {% endif %}>
                 </div>
