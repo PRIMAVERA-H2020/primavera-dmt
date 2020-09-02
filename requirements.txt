@@ -1,5 +1,5 @@
 Cython
-django>=2.2.13
+django>=2.2.13,<2.3 
 django-filter
 django-solo
 django-tables2
