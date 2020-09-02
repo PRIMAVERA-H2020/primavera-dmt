@@ -527,7 +527,7 @@ class ObservationFileTable(tables.Table):
                     'size', 'checksum', 'tape_url']
         order_by = 'name'
 
-    obs_set = tables.Column(order_by=('obs_set.name', 'obs_set.version'))
+    obs_set = tables.Column(order_by=('obs_set__name', 'obs_set__version'))
     online = tables.BooleanColumn(verbose_name='Online?')
     variable_name = tables.Column(verbose_name='Variable')
     size = tables.Column(order_by='size')
