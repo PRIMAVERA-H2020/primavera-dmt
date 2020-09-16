@@ -23,9 +23,7 @@ DEFAULT_LOG_FORMAT = '%(levelname)s: %(message)s'
 
 logger = logging.getLogger(__name__)
 
-BASE_GWS = '/gws/nopw/j04/primavera4/stream1'
-ARCHIVE_BASE = '/badc/cmip6'
-
+BASE_INCOMING_DIR = '/gws/nopw/j04/primavera5/upload/CMCC/20200427'
 
 def parse_args():
     """
@@ -68,7 +66,12 @@ def main(args):
             logger.error(f'{dreq} no files found in DMT')
             continue
         logger.debug(f'Replacing {df.name}')
-        pass
+        file_name = df.name
+        old_path = df.directory
+        drs_path = construct_drs_path(df)
+        new_path = os.path.join(BASE_INCOMING_DIR, drs_path, file_name)
+        if not os.path.exists(new_path):
+            logger.error(f'{new_path} not found')
 
 
 if __name__ == "__main__":
