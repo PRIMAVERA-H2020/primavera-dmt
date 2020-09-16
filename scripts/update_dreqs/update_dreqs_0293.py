@@ -70,6 +70,7 @@ def main(args):
         old_path = df.directory
         drs_path = construct_drs_path(df)
         new_path = os.path.join(BASE_INCOMING_DIR, drs_path, file_name)
+        new_path.replace(df.version, 'v20200401')
         if not os.path.exists(new_path):
             logger.error(f'{new_path} not found')
 
