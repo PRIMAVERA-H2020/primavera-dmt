@@ -48,24 +48,27 @@ def main(args):
     """
     dreqs = DataRequest.objects.filter(
         climate_model__short_name='CMCC-CM2-VHR4',
-        experiment__short_name='control-1950'
+        experiment__short_name='control-1950',
+        datafile__isnull=False
     ).exclude(
-        variable_request__table_name__startswith='SI'
-    ).exclude(
-        variable_request__table_name__startswith='Prim'
+        variable_request__table_name__in=['LImon', 'Lmon', 'Oday', 'Omon', 
+                                          'PrimOday', 'PrimOmon', 'SIday', 
+                                          'SImon']
     ).distinct().order_by(
         'variable_request__table_name', 'variable_request__cmor_name'
     )
 
     num_dreqs = dreqs.count()
-    if num_dreqs != 116:
-        logger.error(f'{num_dreqs} data requests found')
-        sys.exit(1)
+    logger.info(f'{num_dreqs} data requests found')
 
     for dreq in dreqs:
-        df = dreq.datafile_set.get(name__contains='198207')
+        try:
+            df = dreq.datafile_set.get(name__contains='198207')
+        except django.core.exceptions.ObjectDoesNotExist:
+            logger.error(f'{dreq} no files found in DMT')
+            continue
         logger.debug(f'Replacing {df.name}')
-        
+        pass
 
 
 if __name__ == "__main__":
