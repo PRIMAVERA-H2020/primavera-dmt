@@ -53,6 +53,9 @@ def main(args):
         variable_request__table_name__in=['6hrPlev', '6hrPlevPt', 'Amon',
                                           'day', 'LImon', 'Lmon', 'Oday',
                                           'Omon', 'SIday', 'SImon']
+    ).exclude(
+        variable_request__table_name='6hrPlevPt',
+        variable_request__cmor_name='psl'
     ).distinct().order_by(
         'variable_request__table_name', 'variable_request__cmor_name'
     )
@@ -61,9 +64,18 @@ def main(args):
     logger.debug(f'{num_files} affected files found')
 
     for df in affected_files:
-        bad_dir = os.path.join(df.directory, df.name, df.name)
-        if not os.path.exists(bad_dir):
+        bad_dir = os.path.join(df.directory, df.name)
+        bad_path = os.path.join(bad_dir, df.name)
+        if not os.path.exists(bad_path):
             logger.error(f'Could not find {df.name} ')
+            continue
+        temp_path = os.path.join(df.directory, df.name) + '.tmp'
+        try:
+            os.rename(bad_path, temp_path)
+            os.rmdir(bad_dir)
+            os.rename(temp_path, os.path.join(df.directory, df.name))
+        except OSError as exc:
+            logger.error(f'{df.name} {exc}')
 
 
 if __name__ == "__main__":
