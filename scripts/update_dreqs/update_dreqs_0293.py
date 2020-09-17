@@ -13,8 +13,8 @@ import sys
 
 import django
 django.setup()
-from pdata_app.models import DataFile, DataRequest  # nopep8
-from pdata_app.utils.common import construct_drs_path, get_gws  # nopep8
+from pdata_app.models import Checksum, DataRequest, TapeChecksum  # nopep8
+from pdata_app.utils.common import construct_drs_path, md5  # nopep8
 
 __version__ = '0.1.0b1'
 
@@ -76,10 +76,20 @@ def main(args):
         if not os.path.exists(incoming_path):
             logger.error(f'{incoming_path} not found')
         # Copy
-        # os.remove(old_path)
-        # shutil.copy(incoming_path, old_path)
-        # df.tape_url = 'et:21500'
-        # df.incoming_directory =
+        os.remove(old_path)
+        shutil.copy(incoming_path, old_path)
+        df.tape_url = 'et:21500'
+        df.incoming_directory = incoming_dir
+        df.save()
+        checksum = md5(old_path)
+        df.checksum_set.all().delete()
+        df.tapechecksum_set.all().delete()
+        Checksum.objects.create(data_file=df, checksum_value=checksum,
+                                checksum_type='ADLER32')
+        TapeChecksum.objects.create(data_file=df, checksum_value=checksum,
+                                    checksum_type='ADLER32')
+
+
 
 
 if __name__ == "__main__":
