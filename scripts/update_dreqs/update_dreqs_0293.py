@@ -67,12 +67,20 @@ def main(args):
             continue
         logger.debug(f'Replacing {df.name}')
         file_name = df.name
-        old_path = df.directory
+        old_dir = df.directory
+        old_path = os.path.join(old_dir, file_name)
         drs_path = construct_drs_path(df)
         new_path = os.path.join(BASE_INCOMING_DIR, drs_path,
                                 file_name).replace(df.version, 'v20200401')
         if not os.path.exists(new_path):
             logger.error(f'{new_path} not found')
+        if len(dreq.directories()) != 1:
+            logger.error(f'{dreq} not one directory')
+        # os.remove(old_path)
+        # shutil.copy(new_path, old_path)
+        # Copy
+        # Update version string of directory
+        # Update each file's directory and version
 
 
 if __name__ == "__main__":
