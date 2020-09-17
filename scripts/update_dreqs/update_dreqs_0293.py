@@ -14,7 +14,7 @@ import sys
 import django
 django.setup()
 from pdata_app.models import DataFile, DataRequest  # nopep8
-from pdata_app.utils.common import construct_drs_path  # nopep8
+from pdata_app.utils.common import construct_drs_path, get_gws  # nopep8
 
 __version__ = '0.1.0b1'
 
@@ -70,17 +70,16 @@ def main(args):
         old_dir = df.directory
         old_path = os.path.join(old_dir, file_name)
         drs_path = construct_drs_path(df)
-        new_path = os.path.join(BASE_INCOMING_DIR, drs_path,
-                                file_name).replace(df.version, 'v20200401')
-        if not os.path.exists(new_path):
-            logger.error(f'{new_path} not found')
-        if len(dreq.directories()) != 1:
-            logger.error(f'{dreq} not one directory')
-        # os.remove(old_path)
-        # shutil.copy(new_path, old_path)
+        incoming_dir = os.path.join(BASE_INCOMING_DIR,
+                                    drs_path).replace(df.version, 'v20200401')
+        incoming_path = os.path.join(incoming_dir, file_name)
+        if not os.path.exists(incoming_path):
+            logger.error(f'{incoming_path} not found')
         # Copy
-        # Update version string of directory
-        # Update each file's directory and version
+        # os.remove(old_path)
+        # shutil.copy(incoming_path, old_path)
+        # df.tape_url = 'et:21500'
+        # df.incoming_directory =
 
 
 if __name__ == "__main__":
