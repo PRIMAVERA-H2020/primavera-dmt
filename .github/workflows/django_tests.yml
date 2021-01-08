@@ -21,18 +21,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install Cython
         pip install -r requirements.txt
-        git clone --depth=50 https://github.com/PRIMAVERA-H2020/primavera-val.git ~/primavera-val
-        export PYTHONPATH=$PYTHONPATH:~/primavera-val
     - name: Configure Django
       run: |
         export DJANGO_SETTINGS_MODULE=pdata_site.settings
-        cp pdata_site/settings_local.py.travis pdata_site/settings_local.py
-        psql -c 'create database travisdb;' -U postgres
+        cp pdata_site/settings_local.py.github pdata_site/settings_local.py
+        mkdir db
         which python
         python --version
         rm pdata_app/migrations/*
         touch pdata_app/migrations/__init__.py
-        python manage.py makemigrations
+        python manage.py makemigrations pdata_app
         python manage.py migrate
     - name: Run Django tests
       run: |
