@@ -26,7 +26,7 @@ jobs:
         which python
         python --version
         export DJANGO_SETTINGS_MODULE=pdata_site.settings
-        export PYTHONPATH=$PYTHONPATH:.
+        export PYTHONPATH=.
         cp pdata_site/settings_local.py.github pdata_site/settings_local.py
         mkdir db
         rm pdata_app/migrations/*
