@@ -27,7 +27,12 @@ jobs:
         python --version
         export DJANGO_SETTINGS_MODULE=pdata_site.settings
         export PYTHONPATH=$GITHUB_WORKSPACE/primavera_dmt
+        echo "PYTHONPATH"
         echo $PYTHONPATH
+        echo "pwd"
+        pwd
+        echo "ls"
+        ls
         cp pdata_site/settings_local.py.github pdata_site/settings_local.py
         mkdir db
         rm pdata_app/migrations/*
@@ -39,4 +44,10 @@ jobs:
         python manage.py test --exclude-tag=validation
     - name: Check debug is disabled
       run: |
+        echo "PYTHONPATH"
+        echo $PYTHONPATH
+        echo "pwd"
+        pwd
+        echo "ls"
+        ls
         python scripts/utils/check_debug.py
