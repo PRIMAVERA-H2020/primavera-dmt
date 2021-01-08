@@ -4,7 +4,7 @@ django-filter
 django-solo
 django-tables2
 mock
-numpy
+numpy<1.20
 netcdftime
 cf-units
 partial-date-time
