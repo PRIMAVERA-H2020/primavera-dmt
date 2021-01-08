@@ -40,4 +40,6 @@ jobs:
         python manage.py test --exclude-tag=validation
     - name: Check debug is disabled
       run: |
+        echo "PYTHONPATH"
+        echo $PYTHONPATH
         python scripts/utils/check_debug.py
