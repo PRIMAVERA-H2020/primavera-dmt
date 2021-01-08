@@ -1,0 +1,51 @@
+name: django_tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, ]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        export PATH="$HOME/miniconda/bin:$PATH"
+        hash -r
+        conda config --set always_yes yes --set changeps1 no
+        conda config --add channels conda-forge
+        conda update -q conda
+        conda info -a
+        conda create -q -n test_environment python=${{ matrix.python-version }} numpy netcdftime mock filelock pytest psycopg2 django>=2.2.13,<2.3 django-filter cf-units
+        source activate test_environment
+        pip install django-solo
+        pip install django-tables2
+        pip install partial-date-time
+        git clone --depth=50 https://github.com/PRIMAVERA-H2020/primavera-val.git ~/primavera-val
+        export PYTHONPATH=$PYTHONPATH:~/primavera-val
+    - name: Configure Django
+      run: |
+        export DJANGO_SETTINGS_MODULE=pdata_site.settings
+        cp pdata_site/settings_local.py.travis pdata_site/settings_local.py
+        psql -c 'create database travisdb;' -U postgres
+        which python
+        python --version
+        rm pdata_app/migrations/*
+        touch pdata_app/migrations/__init__.py
+        python manage.py makemigrations
+        python manage.py migrate
+    - name: Run Django tests
+      run: |
+        python manage.py test
+    - name: Check debug is disabled
+      run: |
+        python scripts/utils/check_debug.py
