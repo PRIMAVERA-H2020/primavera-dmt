@@ -9,6 +9,9 @@ jobs:
       matrix:
         python-version: [3.7, ]
 
+    env:
+      PYTHONPATH: $GITHUB_WORKSPACE
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -26,7 +29,6 @@ jobs:
         which python
         python --version
         export DJANGO_SETTINGS_MODULE=pdata_site.settings
-        export PYTHONPATH=$GITHUB_WORKSPACE
         echo "PYTHONPATH"
         echo $PYTHONPATH
         echo "pwd"
@@ -44,6 +46,7 @@ jobs:
         python manage.py test --exclude-tag=validation
     - name: Check debug is disabled
       run: |
+        export PYTHONPATH=$GITHUB_WORKSPACE
         echo "PYTHONPATH"
         echo $PYTHONPATH
         echo "pwd"
