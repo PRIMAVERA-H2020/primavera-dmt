@@ -9,9 +9,6 @@ jobs:
       matrix:
         python-version: [3.7, ]
 
-    env:
-      PYTHONPATH: $GITHUB_WORKSPACE
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -40,6 +37,5 @@ jobs:
         python manage.py test --exclude-tag=validation
     - name: Check debug is disabled
       run: |
-        echo "PYTHONPATH"
-        echo $PYTHONPATH
+        export PYTHONPATH=$GITHUB_WORKSPACE
         python scripts/utils/check_debug.py
