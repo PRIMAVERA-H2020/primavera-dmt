@@ -2,15 +2,22 @@
 test_validate_data_submission.py - unit tests for validate_data_submission.py
 """
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import tag, TestCase
 import mock
 
-from scripts.validate_data_submission import update_database_submission
+try:
+    import iris
+except ImportError:
+    pass
+else:
+    # Only import the validations if Iris is available
+    from scripts.validate_data_submission import update_database_submission
 from pdata_app.models import DataSubmission
 from pdata_app.utils.dbapi import get_or_create
 from vocabs.vocabs import STATUS_VALUES
 
 
+@tag('validation')
 class TestUpdateDatabaseSubmission(TestCase):
     @mock.patch('scripts.validate_data_submission.create_database_file_object')
     def setUp(self, mock_create_file):
@@ -19,7 +26,7 @@ class TestUpdateDatabaseSubmission(TestCase):
         self.ds = get_or_create(DataSubmission, incoming_directory='/dir',
                                 directory='/dir', user=user,
                                 status=STATUS_VALUES['PENDING_PROCESSING'])
-        self.metadata = [{'file': 'file1'},]
+        self.metadata = [{'file': 'file1'}, ]
         update_database_submission(self.metadata, self.ds)
 
     def test_submission_status(self):

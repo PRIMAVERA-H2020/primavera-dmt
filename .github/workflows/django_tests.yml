@@ -34,7 +34,7 @@ jobs:
         python manage.py migrate
     - name: Run Django tests
       run: |
-        python manage.py test
+        python manage.py test --exclude-tag=validation
     - name: Check debug is disabled
       run: |
         python scripts/utils/check_debug.py

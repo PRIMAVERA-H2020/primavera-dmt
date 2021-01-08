@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/PRIMAVERA-H2020/primavera-dmt.svg?branch=master)](https://travis-ci.org/PRIMAVERA-H2020/primavera-dmt) [![DOI](https://zenodo.org/badge/139697569.svg)](https://zenodo.org/badge/latestdoi/139697569)
+[![DOI](https://zenodo.org/badge/139697569.svg)](https://zenodo.org/badge/latestdoi/139697569)
 
 # primavera-dmt
 PRIMAVERA Data Management Tool
@@ -22,11 +22,19 @@ PRIMAVERA Data Management Tool
    source activate primavera-dmt
    pip install django-solo django-tables2
    ```
-   Get a copy of the primavera-val code:
+   Alternatively, if the validation of files won't be run then Iris isn't required
+   and all requirements can be installed via pip:
+   ```
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt 
+   ```
+
+   If validation will be run then get a copy of the primavera-val code:
    ```
    git clone https://github.com/PRIMAVERA-H2020/primavera-val.git
    export PYTHONPATH=$PYTHONPATH:./primavera-val
    ```
+   
    
 2. Create local settings:    
    ```  
@@ -48,6 +56,10 @@ PRIMAVERA Data Management Tool
 4. Run tests:
    ```
    python manage.py test
+   ```
+   If Iris wasn't installed then the validation tests should be skipped: 
+   ```
+   python manage.py test --exclude-tag=validation
    ```
    
 5. View the website in a local development server:
