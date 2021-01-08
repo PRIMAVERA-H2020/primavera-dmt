@@ -29,7 +29,7 @@ PRIMAVERA Data Management Tool
    pip install -r requirements.txt 
    ```
 
-   If validation will be run then get a copy of the primavera-val code:
+   If validation will be run then clone the primavera-val code:
    ```
    git clone https://github.com/PRIMAVERA-H2020/primavera-val.git
    export PYTHONPATH=$PYTHONPATH:./primavera-val
