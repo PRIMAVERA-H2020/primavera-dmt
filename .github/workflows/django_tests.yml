@@ -18,6 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install Cython
         pip install -r requirements.txt
         git clone --depth=50 https://github.com/PRIMAVERA-H2020/primavera-val.git ~/primavera-val
         export PYTHONPATH=$PYTHONPATH:~/primavera-val
