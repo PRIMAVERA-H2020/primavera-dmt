@@ -17,11 +17,12 @@ django.setup()
 
 from django.test import TestCase  # nopep8
 
-from pdata_app.models import Checksum, DataFile, Institute  # nopep8
+from pdata_app.models import Checksum, DataFile, Institute, Project  # nopep8
 from pdata_app.tests.common import make_example_files  # nopep8
 
 from pdata_app.utils.attribute_update import (InstitutionIdUpdate,
                                               SourceIdUpdate,
+                                              MipEraUpdate,
                                               VariantLabelUpdate,
                                               VarNameToOutNameUpdate,
                                               FileOfflineError,
@@ -274,6 +275,261 @@ class TestSourceIdUpdate(TestCase):
             '/gws/nopw/j04/primavera5/stream1/t/HighResMIP/MOHC/better-model/'
             't/r1i1p1/Amon/var1/gn/v12345678/'
             'var1_Amon_better-model_t_r1i1p1_gn_1950-1960.nc'
+        )
+        mock_symlink.assert_not_called()
+
+
+class TestMipEraUpdate(TestCase):
+    """Test scripts.attribute_update.MipEraUpdate"""
+    def setUp(self):
+        make_example_files(self)
+        self.test_file = DataFile.objects.get(name='test1')
+        _make_files_realistic()
+        self.test_file.refresh_from_db()
+        self.desired_mip_era, _created = Project.objects.get_or_create(
+            short_name='PRIMAVERA',
+            full_name='PRIMAVERA'
+        )
+        self.dest_dreq = self.dreq1
+        self.dest_dreq.id = None
+        self.dest_dreq.project = self.desired_mip_era
+        self.dest_dreq.save()
+        mock.patch.object(pdata_app.utils.attribute_update, 'BASE_OUTPUT_DIR',
+                          return_value='/gws/nopw/j04/primavera5/stream1')
+
+        patch = mock.patch('pdata_app.utils.common.run_command')
+        self.mock_run_cmd = patch.start()
+        self.addCleanup(patch.stop)
+
+    def test_exit_if_no_dreq(self):
+        self.dest_dreq.delete()
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        self.assertRaises(Exception, updater.update)
+
+    def test_online(self):
+        self.test_file.online = False
+        self.test_file.save()
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        self.assertRaises(FileOfflineError, updater.update)
+
+    def test_not_on_disk(self):
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        self.assertRaises(FileNotOnDiskError, updater.update)
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    def test_mip_era_updated(self, mock_checksum, mock_rename,
+                               mock_available):
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        self.test_file.refresh_from_db()
+        self.assertEqual(self.test_file.project.short_name,
+                         self.desired_mip_era.short_name)
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    def test_filename_updated(self, mock_checksum, mock_rename,
+                              mock_available):
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        self.test_file.refresh_from_db()
+        desired_filename = 'var1_Amon_t_t_r1i1p1_gn_1950-1960.nc'
+        self.assertEqual(self.test_file.name, desired_filename)
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    def test_directory_updated(self, mock_checksum, mock_rename,
+                               mock_available):
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        self.test_file.refresh_from_db()
+        desired_dir = ('/gws/nopw/j04/primavera9/stream1/PRIMAVERA/'
+                       'HighResMIP/MOHC/t/t/r1i1p1/Amon/var1/gn/'
+                       'v12345678')
+        self.assertEqual(self.test_file.directory, desired_dir)
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    def test_update_attributes(self, mock_checksum, mock_rename,
+                               mock_available):
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        calls = [
+            mock.call("ncatted -a mip_era,global,o,c,PRIMAVERA "
+                      "/gws/nopw/j04/primavera9/stream1/path/"
+                      "var1_table_model_expt_varlab_gn_1-2.nc"),
+            mock.call("ncatted -a further_info_url,global,o,c,"
+                      "'https://furtherinfo.es-doc.org/PRIMAVERA.MOHC.t."
+                      "t.none.r1i1p1' "
+                      "/gws/nopw/j04/primavera9/stream1/path/"
+                      "var1_table_model_expt_varlab_gn_1-2.nc"),
+        ]
+        self.mock_run_cmd.assert_has_calls(calls)
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DataRequestUpdate.'
+                '_update_database_attribute')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    def test_update_file_only(self, mock_checksum, mock_rename, mock_db_change,
+                              mock_available):
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era, True)
+        updater.update()
+        calls = [
+            mock.call("ncatted -a mip_era,global,o,c,PRIMAVERA "
+                      "/gws/nopw/j04/primavera9/stream1/path/"
+                      "var1_table_model_expt_varlab_gn_1-2.nc"),
+            mock.call("ncatted -a further_info_url,global,o,c,"
+                      "'https://furtherinfo.es-doc.org/PRIMAVERA.MOHC.t."
+                      "t.none.r1i1p1' "
+                      "/gws/nopw/j04/primavera9/stream1/path/"
+                      "var1_table_model_expt_varlab_gn_1-2.nc"),
+        ]
+        self.mock_run_cmd.assert_has_calls(calls)
+        mock_db_change.assert_not_called()
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    def test_move_dreq(self, mock_checksum, mock_rename, mock_available):
+        df = DataFile.objects.get(
+            name='var1_table_model_expt_varlab_gn_1-2.nc'
+        )
+        self.assertEqual(df.data_request.project.short_name, 't')
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        df.refresh_from_db()
+        self.assertEqual(df.data_request.project.short_name,
+                         'PRIMAVERA')
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.adler32')
+    @mock.patch('pdata_app.utils.attribute_update.os.path.getsize')
+    def test_checksum(self, mock_size, mock_adler, mock_rename,
+                      mock_available):
+        mock_size.return_value = 256
+        mock_adler.return_value = '9876543210'
+        df = DataFile.objects.get(
+            name='var1_table_model_expt_varlab_gn_1-2.nc'
+        )
+        self.assertEqual(df.data_request.project.short_name, 't')
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        df.refresh_from_db()
+        self.assertEqual(df.size, 256)
+        self.assertEqual(df.tape_size, 1)
+        self.assertEqual(df.checksum_set.first().checksum_value, '9876543210')
+        self.assertEqual(df.tapechecksum_set.first().checksum_value,
+                         '1234567890')
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    @mock.patch('pdata_app.utils.attribute_update.os.makedirs')
+    @mock.patch('pdata_app.utils.attribute_update.os.rename')
+    @mock.patch('pdata_app.utils.attribute_update.os.listdir')
+    @mock.patch('pdata_app.utils.attribute_update.delete_drs_dir')
+    @mock.patch('pdata_app.utils.attribute_update.os.symlink')
+    @mock.patch('pdata_app.utils.attribute_update.os.path.lexists')
+    @mock.patch('pdata_app.utils.attribute_update.os.path.islink')
+    @mock.patch('pdata_app.utils.attribute_update.os.remove')
+    def test_renaming(self, mock_rm, mock_islink, mock_lexists, mock_symlink,
+                      mock_del_drs_dir, mock_ls, mock_rename, mock_mkdirs,
+                      mock_checksum, mock_available):
+        mock_islink.return_vale = True
+        mock_lexists.return_vale = True
+        mock_ls.return_value = False
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        mock_mkdirs.assert_has_calls([
+            mock.call('/gws/nopw/j04/primavera9/stream1/PRIMAVERA/HighResMIP/MOHC/'
+                      't/t/r1i1p1/Amon/var1/gn/v12345678'),
+            mock.call('/gws/nopw/j04/primavera5/stream1/PRIMAVERA/HighResMIP/MOHC/'
+                      't/t/r1i1p1/Amon/var1/gn/v12345678')
+        ])
+        mock_rename.assert_called_with(
+            '/gws/nopw/j04/primavera9/stream1/path/'
+            'var1_table_model_expt_varlab_gn_1-2.nc',
+            '/gws/nopw/j04/primavera9/stream1/PRIMAVERA/HighResMIP/MOHC/t/'
+            't/r1i1p1/Amon/var1/gn/v12345678/'
+            'var1_Amon_t_t_r1i1p1_gn_1950-1960.nc'
+        )
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    @mock.patch('pdata_app.utils.attribute_update.os.makedirs')
+    @mock.patch('pdata_app.utils.attribute_update.os.rename')
+    @mock.patch('pdata_app.utils.attribute_update.os.listdir')
+    @mock.patch('pdata_app.utils.attribute_update.delete_drs_dir')
+    @mock.patch('pdata_app.utils.attribute_update.os.symlink')
+    @mock.patch('pdata_app.utils.attribute_update.os.path.lexists')
+    @mock.patch('pdata_app.utils.attribute_update.os.path.islink')
+    @mock.patch('pdata_app.utils.attribute_update.os.remove')
+    def test_sym_link(self, mock_rm, mock_islink, mock_lexists, mock_symlink,
+                      mock_del_drs_dir, mock_ls, mock_rename, mock_mkdirs,
+                      mock_checksum, mock_available):
+        mock_islink.return_vale = True
+        mock_lexists.return_vale = True
+        mock_ls.return_value = False
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        mock_rm.assert_called_once_with(
+            '/gws/nopw/j04/primavera5/stream1/t/HighResMIP/MOHC/t/t/r1i1p1/'
+            'Amon/var1/gn/v12345678/var1_table_model_expt_varlab_gn_1-2.nc'
+        )
+        mock_mkdirs.assert_has_calls([
+            mock.call('/gws/nopw/j04/primavera9/stream1/PRIMAVERA/HighResMIP/MOHC/'
+                      't/t/r1i1p1/Amon/var1/gn/v12345678'),
+            mock.call('/gws/nopw/j04/primavera5/stream1/PRIMAVERA/HighResMIP/MOHC/'
+                      't/t/r1i1p1/Amon/var1/gn/v12345678')
+        ])
+        mock_symlink.assert_called_with(
+            '/gws/nopw/j04/primavera9/stream1/PRIMAVERA/HighResMIP/MOHC/t/'
+            't/r1i1p1/Amon/var1/gn/v12345678/'
+            'var1_Amon_t_t_r1i1p1_gn_1950-1960.nc',
+            '/gws/nopw/j04/primavera5/stream1/PRIMAVERA/HighResMIP/MOHC/t/'
+            't/r1i1p1/Amon/var1/gn/v12345678/'
+            'var1_Amon_t_t_r1i1p1_gn_1950-1960.nc'
+
+        )
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    @mock.patch('pdata_app.utils.attribute_update.os.makedirs')
+    @mock.patch('pdata_app.utils.attribute_update.os.rename')
+    @mock.patch('pdata_app.utils.attribute_update.os.listdir')
+    @mock.patch('pdata_app.utils.attribute_update.delete_drs_dir')
+    @mock.patch('pdata_app.utils.attribute_update.os.symlink')
+    @mock.patch('pdata_app.utils.attribute_update.os.path.lexists')
+    @mock.patch('pdata_app.utils.attribute_update.os.path.islink')
+    @mock.patch('pdata_app.utils.attribute_update.os.remove')
+    def test_sym_link_not_required(self, mock_rm, mock_islink, mock_lexists,
+                                   mock_symlink, mock_del_drs_dir, mock_ls,
+                                   mock_rename, mock_mkdirs, mock_checksum,
+                                   mock_available):
+        mock_islink.return_vale = True
+        mock_lexists.return_vale = True
+        mock_ls.return_value = False
+
+        self.test_file.directory = '/gws/nopw/j04/primavera5/stream1/path'
+        self.test_file.save()
+
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era)
+        updater.update()
+        mock_mkdirs.assert_called_once_with(
+            '/gws/nopw/j04/primavera5/stream1/PRIMAVERA/HighResMIP/MOHC/t/'
+            't/r1i1p1/Amon/var1/gn/v12345678'
+        )
+        mock_rename.assert_called_with(
+            '/gws/nopw/j04/primavera5/stream1/path/'
+            'var1_table_model_expt_varlab_gn_1-2.nc',
+            '/gws/nopw/j04/primavera5/stream1/PRIMAVERA/HighResMIP/MOHC/t/'
+            't/r1i1p1/Amon/var1/gn/v12345678/'
+            'var1_Amon_t_t_r1i1p1_gn_1950-1960.nc'
         )
         mock_symlink.assert_not_called()
 

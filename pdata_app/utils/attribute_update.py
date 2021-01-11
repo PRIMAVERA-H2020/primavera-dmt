@@ -9,7 +9,7 @@ import re
 import six
 
 from pdata_app.models import (Checksum, ClimateModel, DataRequest, Institute,
-                              Settings, TapeChecksum)
+                              Project, Settings, TapeChecksum)
 from pdata_app.utils.common import (adler32, construct_drs_path,
                                     construct_filename, get_gws,
                                     delete_drs_dir, is_same_gws,
@@ -343,6 +343,49 @@ class SourceIdUpdate(DataRequestUpdate):
                             '{}'.format(self.datafile.project.short_name,
                                         self.datafile.institute.short_name,
                                         self.new_value,
+                                        self.datafile.experiment.short_name,
+                                        self.datafile.rip_code))
+        run_ncatted(self.old_directory, self.old_filename,
+                    'further_info_url', 'global', 'c', further_info_url, False)
+
+
+class MipEraUpdate(DataRequestUpdate):
+    """
+    Update a DataFile's mip_era (project in the DMT).
+    """
+    def __init__(self, datafile, new_value, update_file_only=False):
+        """
+        Initialise the class
+        """
+        super(MipEraUpdate, self).__init__(datafile, new_value,
+                                           update_file_only)
+        self.data_req_attribute_name = 'project'
+        self.data_req_attribute_value = Project.objects.get(
+            short_name=self.new_value
+        )
+
+    def _update_database_attribute(self):
+        """
+        Update the source_id
+        """
+        new_mip_era = Project.objects.get(short_name=self.new_value)
+        self.datafile.project = new_mip_era
+        self.datafile.save()
+
+    def _update_file_attribute(self):
+        """
+        Update the source_id and make the same change in the further_info_url.
+        Assume the file has its original path and name.
+        """
+        # source_id
+        run_ncatted(self.old_directory, self.old_filename,
+                    'mip_era', 'global', 'c', self.new_value, False)
+
+        # further_info_url
+        further_info_url = ('https://furtherinfo.es-doc.org/{}.{}.{}.{}.none.'
+                            '{}'.format(self.new_value,
+                                        self.datafile.institute.short_name,
+                                        self.datafile.climate_model.short_name,
                                         self.datafile.experiment.short_name,
                                         self.datafile.rip_code))
         run_ncatted(self.old_directory, self.old_filename,
