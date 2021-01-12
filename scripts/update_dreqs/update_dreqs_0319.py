@@ -84,6 +84,10 @@ def main(args):
                                temp_dir=SCRATCH_DIR)
         updater.update()
 
+        if dreq.datafile_set.count() == 0:
+            logger.debug('DataRequest has no files so deleting CMIP6 {dreq}')
+            dreq.delete()
+
 
 if __name__ == "__main__":
     cmd_args = parse_args()
