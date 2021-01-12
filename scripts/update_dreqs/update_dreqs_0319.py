@@ -19,6 +19,9 @@ __version__ = '0.1.0b1'
 
 logger = logging.getLogger(__name__)
 
+# Directory to copy the file to, to run the attribute edits
+SCRATCH_DIR = "/work/scratch-nopw/jseddon/temp"
+
 
 def parse_args():
     """
@@ -77,7 +80,8 @@ def main(args):
             logger.debug('Created {}'.format(new_dreq))
 
         updater = MipEraUpdate(data_file, new_mip_era,
-                               update_file_only=args.incoming)
+                               update_file_only=args.incoming,
+                               temp_dir=SCRATCH_DIR)
         updater.update()
 
 

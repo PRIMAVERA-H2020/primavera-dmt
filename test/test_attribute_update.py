@@ -395,6 +395,50 @@ class TestMipEraUpdate(TestCase):
     @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
     @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
     @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    @mock.patch('pdata_app.utils.attribute_update.os.rename')
+    @mock.patch('pdata_app.utils.attribute_update.os.remove')
+    @mock.patch('pdata_app.utils.attribute_update.os.rmdir')
+    @mock.patch('pdata_app.utils.attribute_update.shutil.copyfile')
+    @mock.patch('pdata_app.utils.attribute_update.tempfile.mkdtemp')
+    def test_update_attributes_temp_dir(self, mock_temp, mock_copy, mock_rmdir,
+                                        mock_remove, mock_osrename,
+                                        mock_checksum, mock_rename,
+                                        mock_available):
+        mock_temp.return_value = '/tmp'
+        updater = MipEraUpdate(self.test_file, self.desired_mip_era,
+                               temp_dir='/tmp')
+        updater.update()
+        calls = [
+            mock.call("ncatted -a mip_era,global,o,c,PRIMAVERA "
+                      "/tmp/var1_table_model_expt_varlab_gn_1-2.nc"),
+            mock.call("ncatted -a further_info_url,global,o,c,"
+                      "'https://furtherinfo.es-doc.org/PRIMAVERA.MOHC.t."
+                      "t.none.r1i1p1' "
+                      "/tmp/var1_table_model_expt_varlab_gn_1-2.nc"),
+        ]
+        self.mock_run_cmd.assert_has_calls(calls)
+        mock_copy.assert_has_calls([
+            mock.call("/gws/nopw/j04/primavera9/stream1/path/"
+                      "var1_table_model_expt_varlab_gn_1-2.nc",
+                      "/tmp/var1_table_model_expt_varlab_gn_1-2.nc"),
+            mock.call("/tmp/var1_table_model_expt_varlab_gn_1-2.nc",
+                      "/gws/nopw/j04/primavera9/stream1/path/"
+                      "var1_table_model_expt_varlab_gn_1-2.nc"),
+        ])
+        mock_osrename.assert_called_with(
+            "/gws/nopw/j04/primavera9/stream1/path/"
+            "var1_table_model_expt_varlab_gn_1-2.nc",
+            "/gws/nopw/j04/primavera9/stream1/path/"
+            "var1_table_model_expt_varlab_gn_1-2.nc.old"
+        )
+        mock_remove.assert_called_with(
+            "/gws/nopw/j04/primavera9/stream1/path/"
+            "var1_table_model_expt_varlab_gn_1-2.nc.old"
+        )
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
     def test_move_dreq(self, mock_checksum, mock_rename, mock_available):
         df = DataFile.objects.get(
             name='var1_table_model_expt_varlab_gn_1-2.nc'

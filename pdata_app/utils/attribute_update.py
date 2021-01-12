@@ -6,7 +6,9 @@ from abc import ABCMeta, abstractmethod
 import logging
 import os
 import re
+import shutil
 import six
+import tempfile
 
 from pdata_app.models import (Checksum, ClimateModel, DataRequest, Institute,
                               Project, Settings, TapeChecksum)
@@ -353,7 +355,8 @@ class MipEraUpdate(DataRequestUpdate):
     """
     Update a DataFile's mip_era (project in the DMT).
     """
-    def __init__(self, datafile, new_value, update_file_only=False):
+    def __init__(self, datafile, new_value, update_file_only=False,
+                 temp_dir=None):
         """
         Initialise the class
         """
@@ -363,6 +366,7 @@ class MipEraUpdate(DataRequestUpdate):
         self.data_req_attribute_value = Project.objects.get(
             short_name=self.new_value
         )
+        self.temp_dir = temp_dir
 
     def _update_database_attribute(self):
         """
@@ -377,8 +381,17 @@ class MipEraUpdate(DataRequestUpdate):
         Update the source_id and make the same change in the further_info_url.
         Assume the file has its original path and name.
         """
+        if self.temp_dir:
+            orig_path = os.path.join(self.old_directory, self.old_filename)
+            temp_dir = tempfile.mkdtemp(dir=self.temp_dir)
+            temp_path = os.path.join(temp_dir, self.old_filename)
+            shutil.copyfile(orig_path, temp_path)
+            working_dir = temp_dir
+        else:
+            working_dir = self.old_directory
+
         # source_id
-        run_ncatted(self.old_directory, self.old_filename,
+        run_ncatted(working_dir, self.old_filename,
                     'mip_era', 'global', 'c', self.new_value, False)
 
         # further_info_url
@@ -388,8 +401,14 @@ class MipEraUpdate(DataRequestUpdate):
                                         self.datafile.climate_model.short_name,
                                         self.datafile.experiment.short_name,
                                         self.datafile.rip_code))
-        run_ncatted(self.old_directory, self.old_filename,
+        run_ncatted(working_dir, self.old_filename,
                     'further_info_url', 'global', 'c', further_info_url, False)
+
+        if self.temp_dir:
+            os.rename(orig_path, orig_path + '.old')
+            shutil.copyfile(temp_path, orig_path)
+            os.remove(orig_path + '.old')
+            os.rmdir(temp_dir)
 
 
 class InstitutionIdUpdate(DataRequestUpdate):
