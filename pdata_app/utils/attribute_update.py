@@ -408,6 +408,7 @@ class MipEraUpdate(DataRequestUpdate):
             os.rename(orig_path, orig_path + '.old')
             shutil.copyfile(temp_path, orig_path)
             os.remove(orig_path + '.old')
+            os.remove(temp_path)
             os.rmdir(temp_dir)
 
 

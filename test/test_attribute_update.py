@@ -431,10 +431,11 @@ class TestMipEraUpdate(TestCase):
             "/gws/nopw/j04/primavera9/stream1/path/"
             "var1_table_model_expt_varlab_gn_1-2.nc.old"
         )
-        mock_remove.assert_called_with(
-            "/gws/nopw/j04/primavera9/stream1/path/"
-            "var1_table_model_expt_varlab_gn_1-2.nc.old"
-        )
+        mock_remove.assert_has_calls([
+            mock.call("/gws/nopw/j04/primavera9/stream1/path/"
+            "var1_table_model_expt_varlab_gn_1-2.nc.old"),
+            mock.call("/tmp/var1_table_model_expt_varlab_gn_1-2.nc")
+        ])
 
     @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
     @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
