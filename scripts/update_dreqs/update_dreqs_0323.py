@@ -47,7 +47,11 @@ def main(args):
         variable_request__table_name__in=['Omon', 'Oday', 'SImon', 'SIday',
                                           'PrimOmon', 'PrimOday', 'PrimSIday'],
         version='v20171227'
+    ).exclude(
+        variable_request__table_name='SIday',
+        variable_request__cmor_name='siconc'
     )
+
 
     num_files = affected_files.count()
     logger.debug(f'{num_files} affected files found')
