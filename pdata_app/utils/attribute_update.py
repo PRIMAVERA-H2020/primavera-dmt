@@ -634,6 +634,41 @@ class CorrectFileNameUpdate(DmtUpdate):
         pass
 
 
+class AddClimatologyFileNameUpdate(DmtUpdate):
+    """
+    Append a filename with -clim to indicate a climatology.
+    """
+    def __init__(self, datafile, update_file_only=False):
+        """
+        Initialise the class
+
+        :param pdata_apps.models.DataFile datafile: the file to update
+        :param bool update_file_only: if true then update just the file and
+            don't make any changes to the database.
+        """
+        super(AddClimatologyFileNameUpdate, self).__init__(datafile, '',
+                                                    update_file_only)
+
+    def update(self):
+        """
+        Update everything.
+        """
+        self._check_available()
+        self.new_filename = self.datafile.name.replace('.nc', '-clim.nc')
+        self.new_directory = self.old_directory
+        self._update_filename_in_db()
+        self._rename_file()
+
+    def _update_file_attribute(self):
+        """
+        This method is required due to the abstract parent class' design but
+        no changes need to be made to the file other than renaming it and so
+        this method is empty.
+        """
+        pass
+
+
+
 class VarNameToOutNameUpdate(DmtUpdate):
     """
     Update a file's name and contents from cmor_name to out_name.
