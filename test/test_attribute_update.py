@@ -694,6 +694,74 @@ class TestInstitutionIdUpdate(TestCase):
         ]
         self.mock_run_cmd.assert_has_calls(calls)
 
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._update_checksum')
+    @mock.patch('pdata_app.utils.attribute_update.os.rename')
+    @mock.patch('pdata_app.utils.attribute_update.os.remove')
+    @mock.patch('pdata_app.utils.attribute_update.os.rmdir')
+    @mock.patch('pdata_app.utils.attribute_update.shutil.copyfile')
+    @mock.patch('pdata_app.utils.attribute_update.tempfile.mkdtemp')
+    def test_update_attributes_temp_dir(self, mock_temp, mock_copy, mock_rmdir,
+                                        mock_remove, mock_osrename,
+                                        mock_checksum, mock_rename,
+                                        mock_available):
+        mock_temp.return_value = '/tmp'
+        updater = InstitutionIdUpdate(self.test_file,
+                                      self.desired_institution_id,
+                                      temp_dir='/tmp')
+        updater.update()
+        calls = [
+            mock.call("ncatted -a institution_id,global,o,c,'NERC' "
+                      "/tmp/var1_table_model_expt_varlab_gn_1-2.nc"),
+            mock.call("ncatted -h -a institution,global,o,c,"
+                      "'Natural Environment Research Council, STFC-RAL, "
+                      "Harwell, Oxford, OX11 0QX, UK' "
+                      "/tmp/var1_table_model_expt_varlab_gn_1-2.nc"),
+            mock.call("ncatted -h -a further_info_url,global,o,c,"
+                      "'https://furtherinfo.es-doc.org/t.NERC.t.t.none."
+                      "r1i1p1' /tmp/var1_table_model_expt_varlab_gn_1-2.nc"),
+            mock.call("ncatted -h -a license,global,o,c,"
+                      "'CMIP6 model data produced by NERC is licensed under a "
+                      "Creative Commons Attribution-ShareAlike 4.0 "
+                      "International License (https://creativecommons.org/"
+                      "licenses). Consult https://pcmdi.llnl.gov/CMIP6/"
+                      "TermsOfUse for terms of use governing CMIP6 output, "
+                      "including citation requirements and proper "
+                      "acknowledgment. Further information about this data, "
+                      "including some limitations, can be found via the "
+                      "further_info_url (recorded as a global attribute in "
+                      "this file). The data producers and data providers make "
+                      "no warranty, either express or implied, including, but "
+                      "not limited to, warranties of merchantability and "
+                      "fitness for a particular purpose. All liabilities "
+                      "arising from the supply of the information (including "
+                      "any liability arising in negligence) are excluded to "
+                      "the fullest extent permitted by law.' "
+                      "/tmp/var1_table_model_expt_varlab_gn_1-2.nc"),
+        ]
+        self.mock_run_cmd.assert_has_calls(calls)
+
+        mock_copy.assert_has_calls([
+            mock.call("/gws/nopw/j04/primavera9/stream1/path/"
+                      "var1_table_model_expt_varlab_gn_1-2.nc",
+                      "/tmp/var1_table_model_expt_varlab_gn_1-2.nc"),
+            mock.call("/tmp/var1_table_model_expt_varlab_gn_1-2.nc",
+                      "/gws/nopw/j04/primavera9/stream1/path/"
+                      "var1_table_model_expt_varlab_gn_1-2.nc"),
+        ])
+        mock_osrename.assert_called_with(
+            "/gws/nopw/j04/primavera9/stream1/path/"
+            "var1_table_model_expt_varlab_gn_1-2.nc",
+            "/gws/nopw/j04/primavera9/stream1/path/"
+            "var1_table_model_expt_varlab_gn_1-2.nc.old"
+        )
+        mock_remove.assert_has_calls([
+            mock.call("/gws/nopw/j04/primavera9/stream1/path/"
+            "var1_table_model_expt_varlab_gn_1-2.nc.old"),
+            mock.call("/tmp/var1_table_model_expt_varlab_gn_1-2.nc")
+        ])
+
 
 class TestVariantLabelUpdate(TestCase):
     """Test scripts.attribute_update.VariantLabelUpdate"""

@@ -417,7 +417,8 @@ class InstitutionIdUpdate(DataRequestUpdate):
     Update a DataFile's institution_id.
     """
 
-    def __init__(self, datafile, new_value, update_file_only=False):
+    def __init__(self, datafile, new_value, update_file_only=False,
+                 temp_dir=None):
         """
         Initialise the class
         """
@@ -427,6 +428,7 @@ class InstitutionIdUpdate(DataRequestUpdate):
         self.data_req_attribute_value = Institute.objects.get(
             short_name=self.new_value
         )
+        self.temp_dir = temp_dir
 
     def _update_database_attribute(self):
         """
@@ -442,8 +444,17 @@ class InstitutionIdUpdate(DataRequestUpdate):
         institution and license.
         Assume the file has its original path and name.
         """
+        if self.temp_dir:
+            orig_path = os.path.join(self.old_directory, self.old_filename)
+            temp_dir = tempfile.mkdtemp(dir=self.temp_dir)
+            temp_path = os.path.join(temp_dir, self.old_filename)
+            shutil.copyfile(orig_path, temp_path)
+            working_dir = temp_dir
+        else:
+            working_dir = self.old_directory
+
         # institution_id
-        run_ncatted(self.old_directory, self.old_filename,
+        run_ncatted(working_dir, self.old_filename,
                     'institution_id', 'global', 'c', self.new_value, False)
 
         # institution
@@ -454,7 +465,7 @@ class InstitutionIdUpdate(DataRequestUpdate):
                     'Oxford, OX11 0QX, UK'
         }
         inst = new_insts[self.new_value]
-        run_ncatted(self.old_directory, self.old_filename,
+        run_ncatted(working_dir, self.old_filename,
                     'institution', 'global', 'c', inst)
 
         # further_info_url
@@ -465,7 +476,7 @@ class InstitutionIdUpdate(DataRequestUpdate):
                    self.datafile.climate_model.short_name,
                    self.datafile.experiment.short_name,
                    self.datafile.rip_code))
-        run_ncatted(self.old_directory, self.old_filename,
+        run_ncatted(working_dir, self.old_filename,
                     'further_info_url', 'global', 'c', further_info_url)
 
         # license
@@ -485,8 +496,15 @@ class InstitutionIdUpdate(DataRequestUpdate):
             f'(including any liability arising in negligence) are excluded to '
             f'the fullest extent permitted by law.'
         )
-        run_ncatted(self.old_directory, self.old_filename,
+        run_ncatted(working_dir, self.old_filename,
                     'license', 'global', 'c', license_txt)
+
+        if self.temp_dir:
+            os.rename(orig_path, orig_path + '.old')
+            shutil.copyfile(temp_path, orig_path)
+            os.remove(orig_path + '.old')
+            os.remove(temp_path)
+            os.rmdir(temp_dir)
 
 
 class VariantLabelUpdate(DataRequestUpdate):
