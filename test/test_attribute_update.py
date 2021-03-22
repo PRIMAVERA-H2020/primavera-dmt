@@ -25,6 +25,7 @@ from pdata_app.utils.attribute_update import (InstitutionIdUpdate,
                                               MipEraUpdate,
                                               VariantLabelUpdate,
                                               CorrectFileNameUpdate,
+                                              AddClimatologyFileNameUpdate,
                                               CorrectDirectoryUpdate,
                                               VarNameToOutNameUpdate,
                                               FileOfflineError,
@@ -910,6 +911,28 @@ class TestCorrectFileNameUpdate(TestCase):
         updater.update()
         self.test_file.refresh_from_db()
         desired_filename = 'var1_Amon_t_t_r1i1p1_gn_1950-1960.nc'
+        self.assertEqual(self.test_file.name, desired_filename)
+
+
+class TestAddClimatologyFileNameUpdate(TestCase):
+    """Test scripts.attribute_update.AddClimatologyFileNameUpdate"""
+    def setUp(self):
+        make_example_files(self)
+        self.test_file = DataFile.objects.get(name='test1')
+        _make_files_realistic()
+        self.test_file.refresh_from_db()
+
+        patch = mock.patch('pdata_app.utils.common.run_command')
+        self.mock_run_cmd = patch.start()
+        self.addCleanup(patch.stop)
+
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._check_available')
+    @mock.patch('pdata_app.utils.attribute_update.DmtUpdate._rename_file')
+    def test_filename_updated(self, mock_rename, mock_available):
+        updater = AddClimatologyFileNameUpdate(self.test_file)
+        updater.update()
+        self.test_file.refresh_from_db()
+        desired_filename = 'var1_table_model_expt_varlab_gn_1-2-clim.nc'
         self.assertEqual(self.test_file.name, desired_filename)
 
 
