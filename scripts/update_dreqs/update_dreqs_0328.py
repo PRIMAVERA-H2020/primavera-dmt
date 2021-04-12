@@ -48,7 +48,7 @@ def main():
     """
     affected_files = DataFile.objects.filter(
         climate_model__short_name='HadGEM3-GC31-HH',
-        variable_request__table_name__in=['SImon', 'SIday', 'PrimSImon']
+        variable_request__table_name__in=['SImon', 'SIday', 'PrimSIday']
     ).distinct().order_by(
         'variable_request__table_name', 'variable_request__cmor_name'
     )
