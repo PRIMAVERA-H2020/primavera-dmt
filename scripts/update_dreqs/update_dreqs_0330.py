@@ -63,7 +63,7 @@ def main(args):
     ]
 
     institute_details = {
-        'id': 'CMCC',
+        'id': 'EC-Earth-Consortium',
         'model_ids': ['EC-Earth3P', 'EC-Earth3P-HR'],
         'calendar': CALENDAR_GREGORIAN
     }
