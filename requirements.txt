@@ -9,3 +9,4 @@ netcdftime
 cf-units
 partial-date-time
 psycopg2
+six
