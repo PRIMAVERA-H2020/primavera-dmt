@@ -35,7 +35,7 @@ def parse_args():
     parser.add_argument('-l', '--log-level',
                         help='set logging level (default: %(default)s)',
                         choices=['debug', 'info', 'warning', 'error'],
-                        default='warning')
+                        default='info')
     parser.add_argument('-c', '--create', help='Create the retrieval request '
                                                'rather than just displaying '
                                                'the data volums',
@@ -54,17 +54,27 @@ def main(args):
     start_year = 1948
     end_year = 2051
 
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HH',
+    #     experiment__short_name='highres-future',
+    #     # variable_request__frequency__in=['3hr'],
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='O'
+    # ).exclude(
+    #     variable_request__table_name__startswith='SI'
+    # ).exclude(
+    #     variable_request__table_name__startswith='Prim'
+    # ).distinct())
+
     data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
-        climate_model__short_name='HadGEM3-GC31-HH',
-        experiment__short_name='hist-1950',
+        climate_model__short_name='HadGEM3-GC31-MH',
+        experiment__short_name='spinup-1950',
+        variable_request__table_name__in=['SImon', 'SIday', 'PrimSIday'],
         datafile__isnull=False
-    ).exclude(
-        variable_request__table_name__startswith='SI'
-    ).exclude(
-        variable_request__table_name__startswith='Prim'
     ).distinct())
 
-    logger.debug('Total data volume: {} Volume to restore: {}'.format(
+    logger.info('Total data volume: {} Volume to restore: {}'.format(
         filesizeformat(get_request_size(data_reqs, start_year, end_year)).
             replace('\xa0', ' '),
         filesizeformat(get_request_size(data_reqs, start_year, end_year,
@@ -81,7 +91,7 @@ def main(args):
 
         rr.data_request.add(*data_reqs)
 
-        logger.debug('Retrieval request {} created.'.format(rr.id))
+        logger.info('Retrieval request {} created.'.format(rr.id))
 
 
 if __name__ == "__main__":

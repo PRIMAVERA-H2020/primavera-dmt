@@ -39,7 +39,7 @@ def parse_args():
     parser.add_argument('-i', '--incoming', help='Update file only, not the '
                                                  'database.',
                         action='store_true')
-    parser.add_argument('request_id', help='to request id to update')
+    parser.add_argument('variant_label', help='the variant label to update')
     parser.add_argument('--version', action='version',
                         version='%(prog)s {}'.format(__version__))
     args = parser.parse_args()
@@ -53,9 +53,9 @@ def main(args):
     """
     dreqs = DataRequest.objects.filter(
         project__short_name='CMIP6',
-        climate_model__short_name='CNRM-CM6-1',
-        experiment__short_name__contains='primWP5',
-        rip_code='r1i1p1f2'
+        climate_model__short_name='EC-Earth3P',
+        experiment__short_name__contains='primWP5-amv',
+        rip_code=args.variant_label
     ).distinct()
 
     dreq_ids = list(dreqs.values_list('id', flat=True))

@@ -79,9 +79,17 @@ def main(args):
         variable_request__table_name__startswith='Prim',
     ).distinct()
 
+    coupled_future = DataRequest.objects.filter(
+        institute__short_name='MPI-M',
+        experiment__short_name='highres-future',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__table_name__startswith='Prim',
+    ).distinct()
+
     # task querysets can be ORed together with |
 
-    all_tasks = amip_future
+    all_tasks = amip_future | coupled_future
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

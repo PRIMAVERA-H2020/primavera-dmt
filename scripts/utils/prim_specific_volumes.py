@@ -100,7 +100,8 @@ def main(args):
         variable_request__table_name__startswith='Prim'
     ).exclude(
         experiment__short_name__in=['primWP5-amv-neg', 'primWP5-amv-pos',
-                                    'dcppc-amv-neg', 'dcppc-amv-pos']
+                                    'dcppc-amv-neg', 'dcppc-amv-pos', 
+                                    'primWP5-coupledseaice']
     )
     uploaded = list(reqs.values_list(
         'climate_model__short_name',

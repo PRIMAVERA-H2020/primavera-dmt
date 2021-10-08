@@ -72,11 +72,11 @@ def main(args):
         logger.debug('{} existing tasks loaded from file'.
                      format(len(existing_tasks)))
 
-    amip_r1p1 = DataRequest.objects.filter(
+    lr_amip = DataRequest.objects.filter(
         institute__short_name='EC-Earth-Consortium',
-        climate_model__short_name__startswith='EC-Earth3P',
+        climate_model__short_name='EC-Earth3P',
         experiment__short_name='highresSST-present',
-        rip_code='r1i1p1f1',        
+        # rip_code='r1i1p1f1',        
         datafile__isnull=False
     ).exclude(
         variable_request__table_name__startswith='Prim'
@@ -86,9 +86,27 @@ def main(args):
         variable_request__dimensions__contains='alevel'
     ).distinct()
 
+    hr_amip = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name__startswith='EC-Earth3P-HR',
+        experiment__short_name='highresSST-present',
+        # rip_code='r1i1p1f1',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__table_name__startswith='Prim'
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+
     # task querysets can be ORed together with |
 
-    all_tasks = (amip_r1p1)
+    all_tasks = (lr_amip | hr_amip).order_by(
+        'climate_model__short_name', 'experiment__short_name', 'rip_code',
+        'variable_request__table_name', 'variable_request__cmor_name'
+    ) # | hr_r1p1)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

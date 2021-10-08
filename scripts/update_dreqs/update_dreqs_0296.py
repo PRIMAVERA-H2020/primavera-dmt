@@ -53,11 +53,49 @@ def main(args):
     start_year = 1948
     end_year = 2051
 
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='ECMWF',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='ECMWF',
+    #     climate_model__short_name__in=['ECMWF-IFS-LR', 'ECMWF-IFS-MR'],
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='ECMWF',
+    #     climate_model__short_name='ECMWF-IFS-HR',
+    #     experiment__short_name='hist-1950',
+    #     rip_code__in=[f'r{r}i1p1f1' for r in range(4, 7)],
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='ECMWF',
+    #     # climate_model__short_name='ECMWF-IFS-HR',
+    #     experiment__short_name='control-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='ECMWF',
+    #     experiment__short_name='highresSST-present',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
     data_reqs = DataRequest.objects.filter(
         institute__short_name='ECMWF',
-        experiment__short_name='hist-1950',
+        experiment__short_name='spinup-1950',
         variable_request__table_name__startswith='Prim',
-        rip_code__in=[f'r1i{i}p1f1' for i in range(1, 9)],
         datafile__isnull=False
     ).distinct()
 

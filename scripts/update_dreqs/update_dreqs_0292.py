@@ -53,13 +53,194 @@ def main(args):
     start_year = 1948
     end_year = 2051
 
-    data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
-        climate_model__short_name='HadGEM3-GC31-LL',
-        experiment__short_name='hist-1950',
-        variable_request__table_name__startswith='Prim',
-        rip_code__in=[f'r1i{i}p1f1' for i in range(2,9)],
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-LL',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code__in=[f'r1i{i}p1f1' for i in range(2,9)],
+    #     datafile__isnull=False
+    # ).distinct())
+
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-MM',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code__in=[f'r1i{i}p1f1' for i in range(1, 4)],
+    #     datafile__isnull=False
+    # ).distinct())
+
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-MM',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code='r1i2p1f1',
+    #     datafile__isnull=False
+    # ).distinct())
+
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-LL',
+    #     experiment__short_name__in=['control-1950', 'spinup-1950'],
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-MM',
+    #     experiment__short_name__in=['control-1950', 'spinup-1950'],
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code='r1i3p1f1',
+    #     datafile__isnull=False
+    # ).distinct())
+
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code='r1i3p1f1',
+    #     datafile__isnull=False
+    # ).distinct())
+
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HH',
+    #     experiment__short_name__in=['control-1950'],  # 'spinup-1950'],
+    #     variable_request__table_name='PrimSIday', 
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HH',
+    #     experiment__short_name__in=['hist-1950'], 
+    #     variable_request__table_name__in=['PrimOmon'],  # 'PrimOmon'],
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).distinct())
+
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HH',
+    #     experiment__short_name__in=['highres-future'],
+    #     variable_request__table_name='PrimOmon',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct())
+
+    # Done LM, MM, HM AMIP
+    # s1 = DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='highresSST-present',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct()
+    # s2 = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='highresSST-present',
+    #     rip_code__in=['r1i3p1f1'],  # , 'r1i3p1f1'],
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct())
+    # data_reqs = s2  # s1 # | s2
+    # Done LM
+    # s1 = DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='highresSST-future',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct()
+    # s2 = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='highresSST-future',
+    #     rip_code__in=['r1i2p1f1', 'r1i3p1f1'],
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct())
+    # data_reqs = s1 | s2
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-LM',
+    #     experiment__short_name='highresSST-future',
+    #     rip_code__in=['r1i14p1f1', 'r1i15p1f1'],
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct())
+    # s1 = DataRequest.objects.filter(
+    #     climate_model__short_name__in=['HadGEM3-GC31-LL'],  # , 'HadGEM3-GC31-MM', 'HadGEM3-GC31-HM'],
+    #     experiment__short_name='highres-future',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct()
+    # s2 = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name__in=['HadGEM3-GC31-LL'],  # , 'HadGEM3-GC31-MM', 'HadGEM3-GC31-HM'],
+    #     experiment__short_name='highres-future',
+    #     rip_code__in=['r1i2p1f1', 'r1i3p1f1', 'r1i4p1f1'],
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct())
+    # data_reqs = s1 | s2
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name__startswith='HadGEM3-GC31',
+    #     experiment__short_name='spinup-1950',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='PrimSI'
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name__startswith='HadGEM3-GC31',
+    #     # experiment__short_name='spinup-1950',
+    #     # rip_code='r1i1p1f1',
+    #     variable_request__table_name__in=['PrimSIday', 'SIday', 'SImon'],
+    #     datafile__isnull=False
+    # ).distinct()
+
+    data_reqs = DataRequest.objects.filter(
+        climate_model__short_name__startswith='HadGEM3-GC31',
+        variable_request__table_name__in=['fx', 'Ofx'],
         datafile__isnull=False
-    ).distinct())
+    ).distinct()
 
     logger.debug('Total data volume: {} Volume to restore: {}'.format(
         filesizeformat(get_request_size(data_reqs, start_year, end_year)).

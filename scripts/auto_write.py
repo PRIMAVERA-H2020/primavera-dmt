@@ -29,7 +29,7 @@ DEFAULT_LOG_FORMAT = '%(levelname)s: %(message)s'
 
 logger = logging.getLogger(__name__)
 
-ONE_HOUR = 60 * 60
+ONE_HOUR = 15 * 60
 
 
 def run_write(data_sub):

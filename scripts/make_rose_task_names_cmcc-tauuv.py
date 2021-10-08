@@ -71,27 +71,29 @@ def main(args):
         logger.debug('{} existing tasks loaded from file'.
                      format(len(existing_tasks)))
 
-    cmcc_amip_future = DataRequest.objects.filter(
-        climate_model__short_name__in=['CMCC-CM2-HR4', 'CMCC-CM2-VHR4'],
-        experiment__short_name='highresSST-future',
-        rip_code='r1i1p1f1',
+    cmcc_tauuv = DataRequest.objects.filter(
+        institute__short_name='CMCC',
+        variable_request__cmor_name__in=['tauu', 'tauv'],
         datafile__isnull=False
     ).exclude(
         variable_request__table_name__startswith='Prim'
     ).distinct()
 
-    cmcc_future = DataRequest.objects.filter(
-        climate_model__short_name__in=['CMCC-CM2-HR4', 'CMCC-CM2-VHR4'],
-        experiment__short_name='highres-future',
-        rip_code='r1i1p1f1',
+    vhr4_ctrl = DataRequest.objects.filter(
+        climate_model__short_name='CMCC-CM2-VHR4',
+        experiment__short_name='control-1950',
         datafile__isnull=False
-    ).exclude(
-        variable_request__table_name__startswith='Prim'
+    ).distinct()
+
+    cmcc_rsutcs = DataRequest.objects.filter(
+        institute__short_name='CMCC',
+        variable_request__cmor_name='rsutcs',
+        datafile__isnull=False
     ).distinct()
 
     # task querysets can be ORed together with |
 
-    all_tasks = (cmcc_amip_future | cmcc_future)
+    all_tasks = cmcc_tauuv | vhr4_ctrl | cmcc_rsutcs
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

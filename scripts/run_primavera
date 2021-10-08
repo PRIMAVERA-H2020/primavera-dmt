@@ -20,6 +20,13 @@ VAL_DIR=~jseddon/primavera/primavera-val
 # Remove the following environment variable on LOTUS that breaks conda
 unset LSB_ECHKPNT_RSH_CMD
 
+# Force NumPy not to parallelise
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export VECLIB_MAXIMUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+
 export PATH=/home/users/jseddon/software/miniconda3/bin:$PATH
 . activate py3-6_iris2-3_nco
 export PYTHON_INTERP=/home/users/jseddon/software/miniconda3/envs/py3-6_iris2-3_nco/bin/python
@@ -40,6 +47,7 @@ if [ "$PYTHON_SCRIPT" != "send_emails.py" ] && \
 [ "$PYTHON_SCRIPT" != "create_root_chown_list.py" ] && \
 [ "$PYTHON_SCRIPT" != "split_retrieve_request.py" ] && \
 [ "$PYTHON_SCRIPT" != "auto_validate.py" ]  && \
+[ "$PYTHON_SCRIPT" != "update_dreqs/update_dreqs_0321.py" ]  && \
 [ "$PYTHON_SCRIPT" != "utils/esgf_timeseries.py" ]; then
     echo "$PYTHON_SCRIPT complete. Sending email."
     "$PYTHON_INTERP" "$DMT_DIR/scripts/create_email.py" "[PRIMAVERA] $SLURM_JOB_ID finished" "$SLURM_JOB_NAME has finished with status $exit_code"

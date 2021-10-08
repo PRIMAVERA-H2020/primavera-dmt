@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-make_rose_task_names_ecmwf_prim_hist.py
+make_rose_task_names_cmcc_prim.py
 
 This script is used to generate a JSON list of the task names that
 should be run by the rose suite that performs submissions to the CREPP
@@ -71,18 +71,28 @@ def main(args):
         logger.debug('{} existing tasks loaded from file'.
                      format(len(existing_tasks)))
 
-    ecmwf = DataRequest.objects.filter(
-        institute__short_name='ECMWF',
-        experiment__short_name__in=['hist-1950', 'control-1950', 
-                                    'highresSST-present', 'spinup-1950'],
-        rip_code__in=[f'r{i}i1p1f1' for i in range(1,9)],
+    cmcc = DataRequest.objects.filter(
+        institute__short_name='CMCC',
         variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    pr_day = DataRequest.objects.filter(
+        institute__short_name='CMCC',
+        variable_request__table_name='day',
+        variable_request__cmor_name='pr',
+        datafile__isnull=False
+    ).distinct()
+
+    fx = DataRequest.objects.filter(
+        institute__short_name='CMCC',
+        variable_request__table_name='fx',
         datafile__isnull=False
     ).distinct()
 
     # task querysets can be ORed together with |
 
-    all_tasks = (ecmwf)
+    all_tasks = (cmcc | pr_day | fx)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

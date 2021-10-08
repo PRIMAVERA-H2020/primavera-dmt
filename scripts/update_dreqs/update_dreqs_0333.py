@@ -53,14 +53,34 @@ def main(args):
     start_year = 1948
     end_year = 2101
 
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='ECMWF',
+    #     experiment__short_name__startswith='primWP5-amv',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='NCAS',
+    #     experiment__short_name__startswith='primWP5-amv',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='MPI-M',
+    #     experiment__short_name__startswith='dcppc-amv',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='CNRM-CERFACS',
+    #     experiment__short_name__startswith='primWP5-amv',
+    #     datafile__isnull=False
+    # ).distinct()
+
     data_reqs = DataRequest.objects.filter(
-        institute__short_name='ECMWF',
+        institute__short_name='EC-Earth-Consortium',
         experiment__short_name__startswith='primWP5-amv',
         datafile__isnull=False
-    ).exclude(
-        variable_request__dimensions__contains='alevhalf'
-    ).exclude(
-        variable_request__dimensions__contains='alevel'
     ).distinct()
 
     logger.debug('Total data volume: {} Volume to restore: {}'.format(

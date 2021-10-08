@@ -79,9 +79,133 @@ def main(args):
         datafile__isnull=False
     ).distinct()
 
+    highres_future_r2p2 = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        # climate_model__short_name='EC-Earth3P-HR',
+        experiment__short_name='highres-future',
+        rip_code='r2i1p2f1',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    highres_future_r3p2 = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        experiment__short_name='highres-future',
+        rip_code='r3i1p2f1',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    amip_future = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        experiment__short_name='highresSST-future',
+        rip_code__in=['r1i1p1f1', 'r2i1p1f1', 'r3i1p1f1'],
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    amip_past_lr = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name='EC-Earth3P',
+        experiment__short_name='highresSST-present',
+        rip_code__in=['r2i1p1f1', 'r3i1p1f1'],
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    amip_past_hr = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name='EC-Earth3P-HR',
+        experiment__short_name='highresSST-present',
+        rip_code__in=['r2i1p1f1', 'r3i1p1f1'],
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+    hist_lr = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name='EC-Earth3P',
+        experiment__short_name='hist-1950',
+        rip_code__in=['r1i1p2f1', 'r2i1p2f1', 'r3i1p2f1'],
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+    hist_hr = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name='EC-Earth3P-HR',
+        experiment__short_name='hist-1950',
+        rip_code__in=['r1i1p2f1', 'r2i1p2f1', 'r3i1p2f1'],
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+    ctrl_lr = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name='EC-Earth3P',
+        experiment__short_name='control-1950',
+        rip_code__in=['r1i1p2f1', 'r2i1p2f1', 'r3i1p2f1'],
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+    ctrl_hr = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name='EC-Earth3P-HR',
+        experiment__short_name='control-1950',
+        rip_code__in=['r1i1p2f1', 'r2i1p2f1', 'r3i1p2f1'],
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+    amip_r1 = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name__in=['EC-Earth3P', 'EC-Earth3P-HR'],
+        experiment__short_name='highresSST-present',
+        rip_code='r1i1p1f1',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    upwelling_flux = DataRequest.objects.filter(
+        climate_model__short_name__contains='EC-Earth3P',
+        experiment__short_name='highresSST-present',
+        rip_code='r1i1p1f1',
+        variable_request__cmor_name__regex='r[ls]u[ts]*',
+        datafile__isnull=False
+    ).distinct()
+
+    fx = DataRequest.objects.filter(
+        climate_model__short_name__contains='EC-Earth3P',
+        variable_request__table_name__contains='fx',
+        datafile__isnull=False
+    ).distinct()
+
     # task querysets can be ORed together with |
 
-    all_tasks = (highres_future_r1p2)
+    all_tasks = (highres_future_r1p2 | highres_future_r2p2 | highres_future_r3p2 | amip_future |
+                 amip_past_lr | amip_past_hr | hist_lr | hist_hr | ctrl_lr | ctrl_hr | 
+                 upwelling_flux | amip_r1 | fx)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

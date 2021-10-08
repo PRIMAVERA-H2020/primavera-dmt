@@ -52,11 +52,14 @@ def parse_args():
 def main():
     """Main entry point"""
     data_reqs = DataRequest.objects.filter(
-        institute__short_name='MPI-M',
+        climate_model__short_name='EC-Earth3',
         experiment__short_name='highresSST-present',
         rip_code__in=['r1i1p1f1'],
         variable_request__table_name='Amon',
-        variable_request__cmor_name__in=['tas', 'ts', 'psl']
+        variable_request__cmor_name__in=[
+            'clt', 'hus', 'pr', 'rlut', 'rlutcs', 'rsut', 'rsutcs', 'ta', 
+            'tas', 'ts', 'ua', 'va', 'zg'
+        ]
     )
     logger.debug('{} data requests found'.format(data_reqs.count()))
 
@@ -71,8 +74,7 @@ def main():
                 os.makedirs(dest_dir)
             dest_path = os.path.join(dest_dir, data_file.name)
             shutil.copyfile(src_path, dest_path)
-            data_file.directory = os.path.join(TEST_DATA_DIR,
-                                               construct_drs_path(data_file))
+            data_file.directory = dest_dir
             data_file.save()
 
 

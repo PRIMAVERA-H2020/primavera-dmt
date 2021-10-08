@@ -46,17 +46,20 @@ def main(args):
     """
     Main entry point
     """
-    dreqs = DataRequest.objects.filter(
-        climate_model__short_name__in=['MPI-ESM1-2-HR', 'MPI-ESM1-2-XR'],
-        experiment__short_name='highresSST-present'
-    ).exclude(
+    dreqs1 = DataRequest.objects.filter(
         climate_model__short_name='MPI-ESM1-2-XR',
+        experiment__short_name='highresSST-present',
         variable_request__cmor_name__in=['hus7h', 'ta7h', 'ua7h']
-    ).exclude(
-        climate_model__short_name='MPI-ESM1-2-HR',
-        variable_request__table_name='Amon',
-        variable_request__cmor_name__in=['tas', 'tasmax'],
     )
+
+    dreqs2 = DataRequest.objects.filter(
+        climate_model__short_name__in=['MPI-ESM1-2-HR', 'MPI-ESM1-2-XR'],
+        experiment__short_name='highresSST-present',
+        variable_request__table_name='Amon',
+        variable_request__cmor_name='tas'
+    )
+
+    dreqs = dreqs1 | dreqs2
 
     logger.debug(f'Found {dreqs.count()} data requests')
 

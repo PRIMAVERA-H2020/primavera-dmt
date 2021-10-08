@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-make_rose_task_names_ec_earth_highres_future.py
+make_rose_task_names_ec_earth_highressst_future.py
 
 This script is used to generate a JSON list of the task names that
 should be run by the rose suite that performs submissions to the CREPP
@@ -71,36 +71,9 @@ def main(args):
         logger.debug('{} existing tasks loaded from file'.
                      format(len(existing_tasks)))
 
-    fut_r1p2 = DataRequest.objects.filter(
+    fut_all = DataRequest.objects.filter(
         institute__short_name='EC-Earth-Consortium',
-        experiment__short_name='highres-future',
-        rip_code='r1i1p2f1',        
-        datafile__isnull=False
-    ).exclude(
-        variable_request__table_name__startswith='Prim'
-    ).exclude(
-        variable_request__dimensions__contains='alevhalf'
-    ).exclude(
-        variable_request__dimensions__contains='alevel'
-    ).distinct()
-
-    fut_r2p2 = DataRequest.objects.filter(
-        institute__short_name='EC-Earth-Consortium',
-        experiment__short_name='highres-future',
-        rip_code='r2i1p2f1',
-        datafile__isnull=False
-    ).exclude(
-        variable_request__table_name__startswith='Prim'
-    ).exclude(
-        variable_request__dimensions__contains='alevhalf'
-    ).exclude(
-        variable_request__dimensions__contains='alevel'
-    ).distinct()
-
-    fut_r3p2 = DataRequest.objects.filter(
-        institute__short_name='EC-Earth-Consortium',
-        experiment__short_name='highres-future',
-        rip_code='r3i1p2f1',
+        experiment__short_name='highresSST-future',
         datafile__isnull=False
     ).exclude(
         variable_request__table_name__startswith='Prim'
@@ -112,7 +85,7 @@ def main(args):
 
     # task querysets can be ORed together with |
 
-    all_tasks = (fut_r1p2 | fut_r2p2 | fut_r3p2)
+    all_tasks = (fut_all)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

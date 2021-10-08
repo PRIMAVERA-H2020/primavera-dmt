@@ -60,9 +60,23 @@ def main(args):
     #     datafile__isnull=False
     # ).distinct()
 
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='CNRM-CERFACS',
+    #     experiment__short_name='hist-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='CNRM-CERFACS',
+    #     experiment__short_name='control-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
     data_reqs = DataRequest.objects.filter(
         institute__short_name='CNRM-CERFACS',
-        experiment__short_name='hist-1950',
+        experiment__short_name='highres-future',
         variable_request__table_name__startswith='Prim',
         datafile__isnull=False
     ).distinct()

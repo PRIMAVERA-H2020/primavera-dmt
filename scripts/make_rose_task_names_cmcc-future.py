@@ -89,7 +89,6 @@ def main(args):
         variable_request__table_name__startswith='Prim'
     ).distinct()
 
-
     # task querysets can be ORed together with |
 
     all_tasks = (cmcc_amip_future | cmcc_future)

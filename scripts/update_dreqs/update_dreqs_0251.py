@@ -72,13 +72,35 @@ def main(args):
     #     variable_request__table_name__startswith='Prim'
     # ).distinct())
 
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-HM',
+    #     experiment__short_name='highresSST-present',
+    #     rip_code__in=['r1i3p1f1'], # , 'r1i2p1f1'],
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='Prim'
+    # ).distinct())
+
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-MH',
+    #     experiment__short_name='spinup-1950',
+    #      variable_request__table_name__in=['Omon', 'Oday', 'PrimOmon', 'PrimOday'],
+    #     datafile__isnull=False
+    # ).distinct())
+
+    # data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-MH',
+    #     experiment__short_name='spinup-1950',
+    #      variable_request__table_name__in=['PrimOmon', 'PrimOday'],
+    #     datafile__isnull=False
+    # ).distinct())
+
     data_reqs = filter_hadgem_stream2(DataRequest.objects.filter(
         climate_model__short_name='HadGEM3-GC31-HM',
-        experiment__short_name='highresSST-present',
-        rip_code__in=['r1i3p1f1'], # , 'r1i2p1f1'],
+        experiment__short_name='hist-1950',
+        rip_code='r1i2p1f1',
+        variable_request__table_name='SImon',
         datafile__isnull=False
-    ).exclude(
-        variable_request__table_name__startswith='Prim'
     ).distinct())
 
     logger.debug('Total data volume: {} Volume to restore: {}'.format(

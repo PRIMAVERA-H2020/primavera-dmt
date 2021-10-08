@@ -37,9 +37,10 @@ def make_dict():
         'data_requests': [
             data_request for data_request in
             DataRequest.objects.filter(
-                climate_model__short_name='MPI-ESM1-2-XR',
-                experiment__short_name='highresSST-present',
-                variable_request__table_name__startswith='Prim',
+                climate_model__short_name__startswith='EC-Earth3P-HR',
+                experiment__short_name='spinup-1950',
+                rip_code='r1i1p1f1',
+                variable_request__frequency='3hr',
                 datafile__isnull=False
             ).distinct()
         ]

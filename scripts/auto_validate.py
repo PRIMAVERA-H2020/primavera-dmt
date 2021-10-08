@@ -45,7 +45,7 @@ PARALLEL_SCRIPT = ('/home/users/jseddon/primavera/LIVE-prima-dm/scripts/'
 VALIDATE_SCRIPT = 'validate_data_submission.py'
 MAX_VALIDATE_SCRIPTS = 6
 NUM_PROCS_USE_LOTUS = 4
-LOTUS_OPTIONS = ('-o ~/lotus/%J.out -e ~/lotus/%J.err -p par-single --ntaks={} '
+LOTUS_OPTIONS = ('-o ~/lotus/%J.out -e ~/lotus/%J.err -p par-single --ntasks={} '
         '--time=12:00:00 --mem=98304'.
                  format(NUM_PROCS_USE_LOTUS))
 VERSION_STRING = 'v00000000'
@@ -63,11 +63,12 @@ def is_max_jobs_reached(job_name, max_num_jobs):
     :param int max_num_jobs: the maximum number of jobs that can run
     :returns: True if `max_num_jobs` with `name` are running
     """
-    cmd_out = subprocess.run('bjobs -w', stdout=subprocess.PIPE,
+    cmd_out = subprocess.run('squeue -u {} -o %.50j'.format(ADMIN_USER), 
+                             stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE, shell=True)
 
     if cmd_out.returncode:
-        logger.error('bjobs returned code {}. Assuming the maximum number of '
+        logger.error('squeue returned code {}. Assuming the maximum number of '
                      'jobs has been reached.'.format(cmd_out.returncode))
         return True
 
@@ -135,6 +136,8 @@ def submit_validation(submission_directory):
         '{}'.format(NUM_PROCS_USE_LOTUS),
         '--version-string',
         VERSION_STRING,
+        '--data-limit',
+        '4000000000',
         submission_directory
     ]
 

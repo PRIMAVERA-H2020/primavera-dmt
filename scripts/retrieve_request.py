@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 BASE_OUTPUT_DIR = Settings.get_solo().base_output_dir
 # The number of processes that et_get.py should use.
 # Between 5 and 10 are recommended
-MAX_ET_GET_PROC = 5
+MAX_ET_GET_PROC = 2
 # The maximum number of retrievals to run in parallel
 MAX_TAPE_GET_PROC = 5
 # The maximum number of files to get from MASS in one moo get command

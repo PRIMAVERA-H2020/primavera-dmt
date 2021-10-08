@@ -57,7 +57,7 @@ def run_retrieve_request(retrieval_id):
         ))
         return
 
-    cmd = ('{} {} -l debug -a {} {}'.format(sys.executable,
+    cmd = ('{} {} -l debug --skip_checksums -a {} {}'.format(sys.executable,
                                             os.path.abspath(
                                                 os.path.join(
                                                     os.path.dirname(__file__),

@@ -52,7 +52,7 @@ def main(args):
     Main entry point
     """
     start_year = 1948
-    end_year = 2051
+    end_year = 2100
 
     # data_reqs = DataRequest.objects.filter(
     #     climate_model__short_name='EC-Earth3P',
@@ -70,9 +70,9 @@ def main(args):
     data_reqs = DataRequest.objects.filter(
         climate_model__short_name='EC-Earth3P-HR',
         experiment__short_name='control-1950',
-        rip_code='r2i1p2f1',
-        variable_request__frequency__in=['3hr'],
-        variable_request__table_name='3hr',
+        rip_code='r3i1p2f1',
+        # variable_request__frequency__in=['mon', 'day'],
+        # variable_request__table_name='3hr',
         datafile__isnull=False
     ).exclude(
         variable_request__table_name__startswith='Prim'

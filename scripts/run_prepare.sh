@@ -9,7 +9,7 @@ if [ ! -f $1 ]; then
     exit 1
 fi
 
-CMOR=cmor
+CMOR=cmor_3_5
 
 # Find the correct set of tables for the data_specs_version
 if grep -q '01.00.13' <<< `ncdump -h $1`; then
@@ -24,6 +24,15 @@ elif grep -q '01.00.27' <<< `ncdump -h $1`; then
 elif grep -q '01.00.28' <<< `ncdump -h $1`; then
     TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/cmip6-cmor-tables-6.2.15.0/Tables
     CMOR=cmor_3_4_0
+elif grep -q '01.00.29' <<< `ncdump -h $1`; then
+    TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/cmip6-cmor-tables-6.5.29/Tables
+    CMOR=cmor_3_4_0
+elif grep -q '01.00.31' <<< `ncdump -h $1`; then
+    TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/cmip6-cmor-tables-6.7.31/Tables
+    CMOR=cmor_3_4_0
+elif grep -q '01.00.33' <<< `ncdump -h $1`; then
+    TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/cmip6-cmor-tables-6.9.33/Tables
+    CMOR=cmor_3_5
 else
     echo 'data_specs_version not known in ' $1 >&2
     exit 1

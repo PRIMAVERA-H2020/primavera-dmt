@@ -69,6 +69,7 @@ MAX_DATA_INTEGRITY_SIZE = 1073741824
 # Additionally, don't run PrePARE on any of the PRIMAVERA only tables
 SKIP_PREPARE_VARS = ['psl_E3hrPt', 'ua850_E3hrPt', 'va850_E3hrPt',
                      'mrlsl_Emon', 'mrlsl_Lmon', 'sialb_SImon',
+                     'tso_3hr',
                      'Prim1hr', 'Prim3hr', 'Prim3hrPt', 'Prim6hr',
                      'Prim6hrPt', 'PrimO6hr', 'PrimOday', 'PrimOmon',
                      'PrimSIday', 'Primday', 'PrimdayPt', 'Primmon',

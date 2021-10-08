@@ -55,9 +55,10 @@ def main(args):
     end_year = 2051
 
     data_reqs = DataRequest.objects.filter(
-        climate_model__short_name='EC-Earth3',
+        climate_model__short_name='EC-Earth3P-HR',
         experiment__short_name='highresSST-present',
-        rip_code='r1i1p1f1',
+        rip_code__in=['r3i1p1f1'],
+        # variable_request__frequency__in=['6hr'],
         datafile__isnull=False
     ).exclude(
         variable_request__table_name__startswith='Prim'

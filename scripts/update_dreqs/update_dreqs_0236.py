@@ -75,7 +75,7 @@ def main(args):
     """
     data_reqs = DataRequest.objects.filter(
         climate_model__short_name='EC-Earth3P-HR',
-        experiment__short_name='control-1950',
+        experiment__short_name='hist-1950',
         rip_code='r1i1p1f1'
     ).order_by(
         'variable_request__table_name',

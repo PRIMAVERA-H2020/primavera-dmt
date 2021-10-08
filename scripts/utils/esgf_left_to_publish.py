@@ -40,6 +40,14 @@ def get_stream_1_2():
         # Exclude MOHC Stream 2
         institute__short_name__in=['MOHC', 'NERC'],
         rip_code__in=mohc_stream2_members,
+    ).exclude(
+        # Exclude EC-Earth atmosphere levels
+        climate_model__short_name__startswith='EC-Earth',
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        # Exclude EC-Earth atmosphere levels
+        climate_model__short_name__startswith='EC-Earth',
+        variable_request__dimensions__contains='alevel'
     ).distinct()
 
     mohc_stream2_members = DataRequest.objects.filter(

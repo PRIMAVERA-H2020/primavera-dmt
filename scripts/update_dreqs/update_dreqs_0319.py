@@ -41,6 +41,8 @@ def parse_args():
                                                  'database.',
                         action='store_true')
     parser.add_argument('request_id', help='to request id to update')
+    parser.add_argument('-s', '--skip-checksum', help='skip checking checksums',
+                        action='store_true')
     parser.add_argument('--version', action='version',
                         version='%(prog)s {}'.format(__version__))
     args = parser.parse_args()
@@ -64,26 +66,30 @@ def main(args):
     )
     logger.debug('DataRequest is {}'.format(dreq))
 
-    logger.debug('Checking checksums')
-    checksum_mismatch = 0
-    for data_file in dreq.datafile_set.order_by('name'):
-        logger.debug('Processing {}'.format(data_file.name))
-        full_path = os.path.join(data_file.directory, data_file.name)
-        actual = adler32(full_path)
-        expected = data_file.checksum_set.first().checksum_value
-        if actual != expected:
-            logger.error(f'Checksum mismatch for {full_path}')
-            checksum_mismatch += 1
-            dfs = DataFile.objects.filter(name=data_file.name)
-            if dfs.count() != 1:
-                logger.error(f'Unable to select file for deletion {full_path}')
+    if not args.skip_checksum:
+        logger.debug('Checking checksums')
+        checksum_mismatch = 0
+        for data_file in dreq.datafile_set.order_by('name'):
+            logger.debug('Processing {}'.format(data_file.name))
+            full_path = os.path.join(data_file.directory, data_file.name)
+            actual = adler32(full_path)
+            if data_file.tapechecksum_set.count():
+                expected = data_file.tapechecksum_set.first().checksum_value
             else:
-                delete_files(dfs.all(), BASE_OUTPUT_DIR)
-    if checksum_mismatch:
-        logger.error(f'Exiting due to {checksum_mismatch} checksum failures.')
-        logger.error(f'Data request is in {dreq.directories()}')
-        sys.exit(1)
-
+                expected = data_file.checksum_set.first().checksum_value
+            if actual != expected:
+                logger.error(f'Checksum mismatch for {full_path}')
+                checksum_mismatch += 1
+                dfs = DataFile.objects.filter(name=data_file.name)
+                if dfs.count() != 1:
+                    logger.error(f'Unable to select file for deletion {full_path}')
+                else:
+                    delete_files(dfs.all(), BASE_OUTPUT_DIR)
+        if checksum_mismatch:
+            logger.error(f'Exiting due to {checksum_mismatch} checksum failures.')
+            logger.error(f'Data request is in {dreq.directories()}')
+            sys.exit(1)
+    
 
     logger.debug('Processing files')
     for data_file in dreq.datafile_set.order_by('name'):
@@ -113,7 +119,11 @@ def main(args):
 
         if dreq.datafile_set.count() == 0:
             logger.debug(f'DataRequest has no files so deleting CMIP6 {dreq}')
-            dreq.delete()
+            try:
+                dreq.delete()
+            except django.db.models.deletion.ProtectedError:
+                dreq.rip_code = 'r9i9p9f9'
+                dreq.save()
 
 
 if __name__ == "__main__":

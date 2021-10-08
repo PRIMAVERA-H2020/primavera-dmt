@@ -78,9 +78,37 @@ def main(args):
         datafile__isnull=False
     ).distinct()
 
+    coup_future = DataRequest.objects.filter(
+        institute__short_name='MPI-M',
+        experiment__short_name='highres-future',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    hist = DataRequest.objects.filter(
+        institute__short_name='MPI-M',
+        experiment__short_name='hist-1950',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    amip = DataRequest.objects.filter(
+        institute__short_name='MPI-M',
+        experiment__short_name='highresSST-present',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    ctrl = DataRequest.objects.filter(
+        institute__short_name='MPI-M',
+        experiment__short_name='control-1950',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
     # task querysets can be ORed together with |
 
-    all_tasks = (amip_future)
+    all_tasks = (amip_future | coup_future | hist | amip | ctrl)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

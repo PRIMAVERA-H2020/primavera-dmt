@@ -39,6 +39,8 @@ def parse_args():
     parser.add_argument('-s', '--skip-checksum', help='skip deleting failed '
                                                       'checksums',
                         action = 'store_true')
+    parser.add_argument('-t', '--totally-skip', help='skip checksums',
+                        action = 'store_true')
     parser.add_argument('--version', action='version',
                         version='%(prog)s {}'.format(__version__))
     args = parser.parse_args()
@@ -61,26 +63,27 @@ def main(args):
     )
     logger.debug('DataRequest is {}'.format(dreq))
 
-    logger.debug('Checking checksums')
-    checksum_mismatch = 0
-    for data_file in dreq.datafile_set.order_by('name'):
-        logger.debug('Checking {}'.format(data_file.name))
-        full_path = os.path.join(data_file.directory, data_file.name)
-        actual = adler32(full_path)
-        expected = data_file.checksum_set.first().checksum_value
-        if actual != expected:
-            logger.error(f'Checksum mismatch for {full_path}')
-            checksum_mismatch += 1
-            if not args.skip_checksum:
-                dfs = DataFile.objects.filter(name=data_file.name)
-                if dfs.count() != 1:
-                    logger.error(f'Unable to select file for deletion {full_path}')
-                else:
-                    delete_files(dfs.all(), BASE_OUTPUT_DIR)
-    if checksum_mismatch:
-        logger.error(f'Exiting due to {checksum_mismatch} checksum failures.')
-        logger.error(f'Data request is in {dreq.directories()}')
-        sys.exit(1)
+    if not args.totally_skip:
+        logger.debug('Checking checksums')
+        checksum_mismatch = 0
+        for data_file in dreq.datafile_set.order_by('name'):
+            logger.debug('Checking {}'.format(data_file.name))
+            full_path = os.path.join(data_file.directory, data_file.name)
+            actual = adler32(full_path)
+            expected = data_file.checksum_set.first().checksum_value
+            if actual != expected:
+                logger.error(f'Checksum mismatch for {full_path}')
+                checksum_mismatch += 1
+                if not args.skip_checksum:
+                    dfs = DataFile.objects.filter(name=data_file.name)
+                    if dfs.count() != 1:
+                        logger.error(f'Unable to select file for deletion {full_path}')
+                    else:
+                        delete_files(dfs.all(), BASE_OUTPUT_DIR)
+        if checksum_mismatch:
+            logger.error(f'Exiting due to {checksum_mismatch} checksum failures.')
+            logger.error(f'Data request is in {dreq.directories()}')
+            sys.exit(1)
 
     logger.debug('Processing files')
     for data_file in dreq.datafile_set.order_by('name'):

@@ -53,14 +53,117 @@ def main(args):
     start_year = 1948
     end_year = 2101
 
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     experiment__short_name='highres-future',
+    #     rip_code='r1i1p2f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     climate_model__short_name='EC-Earth3P',
+    #     experiment__short_name='highres-future',
+    #     rip_code='r2i1p2f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     climate_model__short_name='EC-Earth3P',
+    #     experiment__short_name='highres-future',
+    #     rip_code='r3i1p2f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     # climate_model__short_name='EC-Earth3P',
+    #     experiment__short_name='highresSST-future',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     # climate_model__short_name='EC-Earth3P',
+    #     experiment__short_name='highresSST-future',
+    #     rip_code='r3i1p1f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     climate_model__short_name='EC-Earth3P',
+    #     experiment__short_name='highresSST-present',
+    #     rip_code='r2i1p1f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='hist-1950',
+    #     rip_code='r1i1p2f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='control-1950',
+    #     rip_code='r3i1p2f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='EC-Earth-Consortium',
+    #     climate_model__short_name='EC-Earth3P',
+    #     experiment__short_name='spinup-1950',
+    #     # rip_code='r3i1p2f1',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
     data_reqs = DataRequest.objects.filter(
         institute__short_name='EC-Earth-Consortium',
-        experiment__short_name='highres-future',
-        rip_code='r1i1p2f1',
+        climate_model__short_name='EC-Earth3',
+        experiment__short_name='highresSST-present',
+        rip_code='r1i1p1f1',
         variable_request__table_name__startswith='Prim',
         datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
     ).distinct()
 
+    # TODO highresSST-present r1i1p1f1
+    
     logger.debug('Total data volume: {} Volume to restore: {}'.format(
         filesizeformat(get_request_size(data_reqs, start_year, end_year)).
             replace('\xa0', ' '),

@@ -37,6 +37,9 @@ def parse_args():
                         choices=['debug', 'info', 'warning', 'error'],
                         default='warning')
     parser.add_argument('request_id', help='to request id to update')
+    parser.add_argument('-s', '--skip-checksum', help='skip deleting failed '
+                                                      'checksums',
+                        action = 'store_true')
     parser.add_argument('--version', action='version',
                         version='%(prog)s {}'.format(__version__))
     args = parser.parse_args()
@@ -69,11 +72,12 @@ def main(args):
         if actual != expected:
             logger.error(f'Checksum mismatch for {full_path}')
             checksum_mismatch += 1
-            dfs = DataFile.objects.filter(name=data_file.name)
-            if dfs.count() != 1:
-                logger.error(f'Unable to select file for deletion {full_path}')
-            else:
-                delete_files(dfs.all(), BASE_OUTPUT_DIR)
+            if not args.skip_checksum:
+                dfs = DataFile.objects.filter(name=data_file.name)
+                if dfs.count() != 1:
+                    logger.error(f'Unable to select file for deletion {full_path}')
+                else:
+                    delete_files(dfs.all(), BASE_OUTPUT_DIR)
     if checksum_mismatch:
         logger.error(f'Exiting due to {checksum_mismatch} checksum failures.')
         logger.error(f'Data request is in {dreq.directories()}')

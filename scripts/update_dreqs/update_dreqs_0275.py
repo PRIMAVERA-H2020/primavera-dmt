@@ -13,7 +13,7 @@ import django
 django.setup()
 
 from pdata_app.models import DataRequest  # nopep8
-
+from pdata_app.utils.common import filter_hadgem_stream2  # nopep8
 __version__ = '0.1.0b1'
 
 DEFAULT_LOG_LEVEL = logging.WARNING
@@ -54,15 +54,30 @@ def main():
     """
     Main entry point
     """
-    hist_mon_day = DataRequest.objects.filter(
+    hist_mon_day = filter_hadgem_stream2(DataRequest.objects.filter(
         institute__short_name='MOHC',
         climate_model__short_name='HadGEM3-GC31-HH',
         experiment__short_name='hist-1950',
+        variable_request__frequency__in=['mon', 'day', '3hr'],
+        rip_code='r1i1p1f1'
+    ))
+
+    ctrl_3hr = DataRequest.objects.filter(
+        institute__short_name='NERC',
+        climate_model__short_name='HadGEM3-GC31-HH',
+        experiment__short_name='control-1950',
+        variable_request__table_name__in=['3hr', 'E3hrPt']
+    ).distinct()
+
+    ctrl_mon_day = filter_hadgem_stream2(DataRequest.objects.filter(
+        institute__short_name='NERC',
+        climate_model__short_name='HadGEM3-GC31-HH',
+        experiment__short_name='control-1950',
         variable_request__frequency__in=['mon', 'day'],
         rip_code='r1i1p1f1'
-    )
+    ))
 
-    dreqs = (hist_mon_day)
+    dreqs = (hist_mon_day | ctrl_mon_day | ctrl_3hr)
 
     logger.info('%s data requests found', dreqs.count())
 

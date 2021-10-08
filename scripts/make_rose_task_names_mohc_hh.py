@@ -80,10 +80,54 @@ def main(args):
         variable_request__table_name__startswith='Prim'
     ).distinct())
 
+    hh_ctrl_3hr = DataRequest.objects.filter(
+        climate_model__short_name='HadGEM3-GC31-HH',
+        experiment__short_name='control-1950',
+        variable_request__table_name='3hr',
+        datafile__isnull=False
+    ).distinct()
+
+    hh_future = filter_hadgem_stream2(DataRequest.objects.filter(
+        climate_model__short_name='HadGEM3-GC31-HH',
+        experiment__short_name='highres-future',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__table_name__startswith='Prim'
+    ).distinct())
+
+    mh_spinup = filter_hadgem_stream2(DataRequest.objects.filter(
+        climate_model__short_name='HadGEM3-GC31-MH',
+        experiment__short_name='spinup-1950',
+        variable_request__table_name__in=['Omon', 'Oday', 'PrimOmon', 'PrimOday'],
+        datafile__isnull=False
+    ).distinct())
+
+    hm_epfyz = filter_hadgem_stream2(DataRequest.objects.filter(
+        climate_model__short_name='HadGEM3-GC31-HM',
+        experiment__short_name__in=['control-1950', 'highres-future', 'hist-1950'],
+        rip_code='r1i1p1f1',
+        variable_request__cmor_name__in=['epfy', 'epfz'],
+        datafile__isnull=False
+    ).distinct())
+
+    orca12_cice = filter_hadgem_stream2(DataRequest.objects.filter(
+        climate_model__short_name__in=['HadGEM3-GC31-HH'],
+        experiment__short_name__in=['control-1950', 'highres-future', 'hist-1950'],
+        variable_request__table_name__in=['SImon', 'SIday', 'PrimSIday'],
+        datafile__isnull=False
+    ).distinct())
+
+    orca12_cice_spinup = filter_hadgem_stream2(DataRequest.objects.filter(
+        climate_model__short_name='HadGEM3-GC31-MH',
+        experiment__short_name='spinup-1950',
+        variable_request__table_name__in=['SImon', 'SIday', 'PrimSIday'],
+        datafile__isnull=False
+    ).distinct())
 
     # task querysets can be ORed together with |
 
-    all_tasks = (hh_pres_day)
+    all_tasks = (hh_pres_day | hh_ctrl_3hr | hh_future | mh_spinup | hm_epfyz | orca12_cice |
+                 orca12_cice_spinup)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

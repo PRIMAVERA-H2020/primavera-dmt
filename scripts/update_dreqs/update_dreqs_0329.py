@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 BASE_OUTPUT_DIR = Settings.get_solo().base_output_dir
 
 # The version string to change to
-NEW_VERSION_STRING = 'v20210416'
+NEW_VERSION_STRING = 'v20210504'
 
 
 def parse_args():
@@ -47,11 +47,15 @@ def main():
     """
     Main entry point
     """
+    # TODO: bug in symbolic link code that can't find link and doesn't create new link
     dreqs = DataRequest.objects.filter(
         climate_model__short_name='HadGEM3-GC31-HH',
-        experiment__short_name__in=['control-1950', 'hist-1950',
-                                    'highres-future'],
-        variable_request__table_name__in=['SImon', 'SIday', 'PrimSIday'],
+        # experiment__short_name__in=['control-1950', 'hist-1950',
+        #                             'highres-future'],
+        # variable_request__table_name__in=['SImon', 'SIday', 'PrimSIday'],
+        experiment__short_name='hist-1950',
+        variable_request__table_name='SImon',
+        variable_request__cmor_name='sisnhc',
         datafile__isnull=False
     ).distinct().order_by(
         'experiment__short_name',

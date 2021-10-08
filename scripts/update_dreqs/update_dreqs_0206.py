@@ -45,9 +45,9 @@ def main(args):
     Main entry point
     """
     bad_sets = ESGFDataset.objects.filter(
-        status='CREATED',
+        status__in=['CREATED', 'NOT_ON_DISK'],
         data_request__climate_model__short_name='HadGEM3-GC31-LL',
-        data_request__experiment__short_name='hist-1950',
+        data_request__experiment__short_name='control-1950',
         data_request__rip_code='r1i1p1f1',
     ).distinct()
 

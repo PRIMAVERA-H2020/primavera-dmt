@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-make_rose_task_names_cmcc_prim.py
+make_rose_task_names_cerfacs_prim.py
 
 This script is used to generate a JSON list of the task names that
 should be run by the rose suite that performs submissions to the CREPP
@@ -71,15 +71,37 @@ def main(args):
         logger.debug('{} existing tasks loaded from file'.
                      format(len(existing_tasks)))
 
-    cmcc = DataRequest.objects.filter(
-        institute__short_name='CMCC',
+    cerfacs_amip = DataRequest.objects.filter(
+        institute__short_name='CNRM-CERFACS',
+        experiment__short_name__startswith='highresSST',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    cerfacs_hist = DataRequest.objects.filter(
+        institute__short_name='CNRM-CERFACS',
+        experiment__short_name__startswith='hist-1950',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    cerfacs_ctrl = DataRequest.objects.filter(
+        institute__short_name='CNRM-CERFACS',
+        experiment__short_name__startswith='control-1950',
+        variable_request__table_name__startswith='Prim',
+        datafile__isnull=False
+    ).distinct()
+
+    cerfacs_fut = DataRequest.objects.filter(
+        institute__short_name='CNRM-CERFACS',
+        experiment__short_name__startswith='highres-future',
         variable_request__table_name__startswith='Prim',
         datafile__isnull=False
     ).distinct()
 
     # task querysets can be ORed together with |
 
-    all_tasks = (cmcc)
+    all_tasks = (cerfacs_amip | cerfacs_hist | cerfacs_ctrl | cerfacs_fut)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

@@ -69,7 +69,7 @@ def main(args):
                            'end_date': datetime(1960, 1, 1)}
     }
 
-    variant_labels = ['r{}i1p2f1'.format(i) for i in range(11, 26)]
+    variant_labels = ['r{}i1p2f1'.format(i) for i in range(1, 11)]
 
     # activity_id
     ActivityId.objects.get_or_create(short_name=activity_id,

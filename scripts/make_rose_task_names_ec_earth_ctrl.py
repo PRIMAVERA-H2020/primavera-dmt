@@ -99,7 +99,7 @@ def main(args):
     ).distinct()
 
     ctrl_r3p2 = DataRequest.objects.filter(
-        climate_model__short_name__in=['EC-Earth3P'],
+        climate_model__short_name__in=['EC-Earth3P', 'EC-Earth3P-HR'],
         experiment__short_name='control-1950',
         rip_code='r3i1p2f1',
         datafile__isnull=False

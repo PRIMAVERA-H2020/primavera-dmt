@@ -48,13 +48,121 @@ def main(args):
     """
     Main entry point
     """
+    # old_data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='hist-1950',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).exclude(
+    #     variable_request__table_name__startswith='Prim'        
+    # ).distinct()
+    # logger.debug('{} data requests found'.format(old_data_reqs.count()))
+
+    # old_data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='control-1950',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).exclude(
+    #     variable_request__table_name__startswith='Prim'        
+    # ).distinct()
+
+    # old_data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3P',
+    #     experiment__short_name='spinup-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
+    # old_data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3-HR',
+    #     experiment__short_name='spinup-1950',
+    #     variable_request__frequency='mon',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
+    # old_data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='spinup-1950',
+    #     # variable_request__frequency='mon',
+    #     # variable_request__frequency='day',
+    #     # variable_request__frequency='6hr',
+    #     variable_request__frequency='3hr',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
+    # both = DataRequest.objects.filter(
+    #     climate_model__short_name__startswith='CMCC-CM2',
+    #     experiment__short_name='highresSST-present',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name='6hrPlevPt',
+    #     variable_request__cmor_name__in=['hus7h', 'huss', 'psl', 'sfcWind', 
+    #                                      'tas', 'ts', 'uas', 'vas'],
+    #     datafile__isnull=False
+    # ).distinct()
+    # hr4 = DataRequest.objects.filter(
+    #     climate_model__short_name='CMCC-CM2-HR4',
+    #     experiment__short_name='highresSST-present',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name__in=['6hrPlev', '6hrPlevPt'],
+    #     variable_request__cmor_name__in=['ua7h', 'va7h'],
+    #     datafile__isnull=False
+    # ).distinct()
+    # old_data_reqs = both | hr4
+
+    # old_data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name__startswith='CMCC-CM2',
+    #     experiment__short_name='highresSST-present',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name='6hrPlevPt',
+    #     variable_request__cmor_name__in=['hus7h', 'huss', 'psl', 'sfcWind',
+    #                                      'tas', 'ts', 'uas', 'vas'],
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # old_data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='HadGEM3-GC31-LL',
+    #     experiment__short_name='hist-1950',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__table_name__in=['PrimSIday', 'SIday', 'SImon'],
+    #     datafile__isnull=False
+    # ).distinct()
+
+    # old_data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name__startswith='HadGEM3-GC31',
+    #     variable_request__table_name__in=['PrimSIday', 'SIday', 'SImon'],
+    #     datafile__isnull=False
+    # ).distinct()
+
     old_data_reqs = DataRequest.objects.filter(
-        institute__short_name='MPI-M',
-        climate_model__short_name='MPIESM-1-2-HR',
-        experiment__short_name='highresSST-present',
-        rip_code='r1i1p1f1',
+        institute__short_name='ECMWF',
+        experiment__short_name__startswith='primWP5-amv',
         datafile__isnull=False
     ).distinct()
+
     logger.debug('{} data requests found'.format(old_data_reqs.count()))
 
     reqs_list = [
@@ -65,7 +173,10 @@ def main(args):
             dr.variable_request.table_name,
             dr.variable_request.cmor_name
         )
-        for dr in old_data_reqs
+        for dr in old_data_reqs.order_by(
+            'variable_request__table_name',
+            'variable_request__cmor_name'
+        )
     ]
 
     with open(args.json_file, 'w') as fh:

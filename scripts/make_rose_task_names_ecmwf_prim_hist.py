@@ -73,15 +73,22 @@ def main(args):
 
     ecmwf = DataRequest.objects.filter(
         institute__short_name='ECMWF',
-        experiment__short_name='hist-1950',
+        experiment__short_name__in=['hist-1950', 'control-1950', 
+                                    'highresSST-present', 'spinup-1950'],
         rip_code__in=[f'r{i}i1p1f1' for i in range(1,9)],
         variable_request__table_name__startswith='Prim',
         datafile__isnull=False
     ).distinct()
 
+    fx = DataRequest.objects.filter(
+        institute__short_name='ECMWF',
+        variable_request__table_name='fx',
+        datafile__isnull=False
+    ).distinct()
+
     # task querysets can be ORed together with |
 
-    all_tasks = (ecmwf)
+    all_tasks = (ecmwf | fx)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

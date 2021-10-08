@@ -12,7 +12,7 @@ import sys
 
 import django
 django.setup()
-from pdata_app.models import DataFile
+from pdata_app.models import ReplacedFile
 
 __version__ = '0.1.0b1'
 
@@ -75,7 +75,7 @@ def main(args):
     """
     Main entry point
     """
-    data_files = DataFile.objects.filter(name__in=AFFECTED_FILES)
+    data_files = ReplacedFile.objects.filter(name__in=AFFECTED_FILES)
 
     num_found = data_files.count()
     num_expected = 30
@@ -91,7 +91,7 @@ def main(args):
             id_files = data_files.filter(tape_url=tape_id)
             for data_file in id_files:
                 tape_path = os.path.join(data_file.incoming_directory,
-                                         data_file.name)
+                                         data_file.name.replace('Earth3P', 'Earth3'))
                 fh.write(f'{tape_path}\n')
 
 if __name__ == "__main__":

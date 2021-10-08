@@ -339,13 +339,35 @@ def main(args):
     # ).exclude(
     #     variable_request__table_name__startswith='Prim'
     # ).distinct()
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name__in=['CMCC-CM2-HR4', 'CMCC-CM2-VHR4'],
+    #     experiment__short_name='highresSST-future',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='Prim'
+    # ).distinct()
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name__in=['HadGEM3-GC31-LL', 'HadGEM3-GC31-MM', 'HadGEM3-GC31-HM'],
+    #     experiment__short_name='highres-future',
+    #     # rip_code__in=[f'r1i{i}p1f1' for i in range(1, 4)],
+    #     variable_request__table_name__in=['Omon', 'Oday'],
+    #     datafile__isnull=False
+    # ).distinct()
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='CNRM-CERFACS',
+    #     variable_request__table_name='SImon',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     esgfdataset__status='PUBLISHED'
+    # ).exclude(
+    #     experiment__short_name__startswith='primWP5'
+    # ).distinct()
     data_reqs = DataRequest.objects.filter(
-        climate_model__short_name__in=['CMCC-CM2-HR4', 'CMCC-CM2-VHR4'],
-        experiment__short_name='highresSST-future',
-        rip_code='r1i1p1f1',
+        climate_model__short_name__in=['HadGEM3-GC31-LL', 'HadGEM3-GC31-MM'],
+        experiment__short_name='spinup-1950',
+        variable_request__table_name__in=['Omon', 'Oday'],
         datafile__isnull=False
-    ).exclude(
-        variable_request__table_name__startswith='Prim'
     ).distinct()
  
  

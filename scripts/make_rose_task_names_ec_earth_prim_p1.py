@@ -72,7 +72,7 @@ def main(args):
                      format(len(existing_tasks)))
 
     highres_future = DataRequest.objects.filter(
-        climate_model__short_name__in=['EC-Earth3P'],
+        climate_model__short_name__in=['EC-Earth3P', 'EC-Earth3P-HR'],
         experiment__short_name='highres-future',
         rip_code='r1i1p1f1',
         datafile__isnull=False
@@ -82,9 +82,54 @@ def main(args):
         variable_request__dimensions__contains='alevel'
     ).distinct()
 
+    hist = DataRequest.objects.filter(
+        climate_model__short_name__in=['EC-Earth3P', 'EC-Earth3P-HR'],
+        experiment__short_name='hist-1950',
+        rip_code='r1i1p1f1',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+    ctrl = DataRequest.objects.filter(
+        climate_model__short_name__in=['EC-Earth3P', 'EC-Earth3P-HR'],
+        experiment__short_name='control-1950',
+        rip_code='r1i1p1f1',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+    spin = DataRequest.objects.filter(
+        climate_model__short_name__in=['EC-Earth3P'],  # , 'EC-Earth3P-HR'],
+        experiment__short_name='spinup-1950',
+        rip_code='r1i1p1f1',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
+    spin_hr = DataRequest.objects.filter(
+        climate_model__short_name='EC-Earth3P-HR',
+        experiment__short_name='spinup-1950',
+        rip_code='r1i1p1f1',
+        # variable_request__frequency__in=['mon', 'day', '6hr'],
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
     # task querysets can be ORed together with |
 
-    all_tasks = (highres_future)
+    all_tasks = (highres_future | hist | ctrl | spin | spin_hr)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

@@ -53,10 +53,16 @@ def main(args):
     start_year = 1948
     end_year = 2101
 
+    # data_reqs = DataRequest.objects.filter(
+    #     institute__short_name='MPI-M',
+    #     experiment__short_name='control-1950',
+    #     variable_request__table_name__startswith='Prim',
+    #     datafile__isnull=False
+    # ).distinct()
+
     data_reqs = DataRequest.objects.filter(
         institute__short_name='MPI-M',
-        # experiment__short_name='highres-future',
-        variable_request__table_name__startswith='Prim',
+        experiment__short_name='highres-future',
         datafile__isnull=False
     ).distinct()
 

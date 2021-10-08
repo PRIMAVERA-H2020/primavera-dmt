@@ -34,6 +34,9 @@ logger = logging.getLogger(__name__)
 # The number of bytes in a tebibyte
 BYTES_IN_TEBIBYTE = 1024 ** 4
 
+# The date that PRIMAVERA ends and we want all data published by
+PRIM_END = datetime.datetime(2021, 12, 31, 0, 0)
+
 
 def get_volume_published():
     """
@@ -74,10 +77,13 @@ def get_total_volume():
         institute__short_name__in=['MOHC', 'NERC'],
         rip_code__in=mohc_stream2_members,
     ).exclude(
-        # Exclude EC-Earth coupled r1i1p1f1
+        # Exclude EC-Earth alevhalf
         institute__short_name='EC-Earth-Consortium',
-        experiment__short_name__in=coupled_expts,
-        rip_code='r1i1p1f1'
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        # Exclude EC-Earth alevel
+        institute__short_name='EC-Earth-Consortium',
+        variable_request__dimensions__contains='alevel'
     ).distinct()
 
     mohc_stream2_members = DataFile.objects.filter(
@@ -161,8 +167,7 @@ def generate_plots(time_series_file, output_image):
     ax.get_legend().set_bbox_to_anchor((0.4, 0.9))
     # Estimate publication rate required
     to_publish = df['Total'][-1] - df['Submitted'][-1]
-    prim_end = datetime.datetime(2020, 7, 31, 0, 0)
-    days_left = (prim_end - datetime.datetime.utcnow()).days
+    days_left = (PRIM_END - datetime.datetime.utcnow()).days
     rate_needed = to_publish / days_left
     # Set the title
     percent_complete = df['Submitted'][-1] / df['Total'][-1] * 100

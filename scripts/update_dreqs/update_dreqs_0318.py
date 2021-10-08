@@ -50,14 +50,48 @@ def main(args):
     """
     Main entry point
     """
-    start_year = 1948
+    start_year = 1900
     end_year = 2101
 
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='control-1950',
+    #     rip_code='r1i1p1f1',
+    #     variable_request__frequency__in=['3hr', '3hrPt'],
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='hist-1950',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='highresSST-present',
+    #     rip_code='r1i1p1f1',
+    #     datafile__isnull=False
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
     data_reqs = DataRequest.objects.filter(
-        climate_model__short_name='EC-Earth3P',
-        experiment__short_name='highres-future',
+        climate_model__short_name='EC-Earth3-HR',
+        experiment__short_name='spinup-1950',
         rip_code='r1i1p1f1',
-        variable_request__table_name__startswith='Prim',
+        # variable_request__frequency__in=['3hr'],
         datafile__isnull=False
     ).exclude(
         variable_request__dimensions__contains='alevhalf'
