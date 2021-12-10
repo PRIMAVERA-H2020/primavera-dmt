@@ -2,7 +2,9 @@
 test_common.py - unit tests for pdata_app.utils.common.py
 """
 from __future__ import unicode_literals, division, absolute_import
-import six
+from pathlib import Path
+import shutil
+import tempfile
 
 try:
     from unittest import mock
@@ -21,6 +23,7 @@ from pdata_app import models
 from pdata_app.utils.common import (make_partial_date_time,
                                     standardise_time_unit,
                                     calc_last_day_in_month, pdt2num,
+                                    remove_empty_dirs,
                                     is_same_gws, get_gws, get_gws_any_dir,
                                     construct_drs_path,
                                     construct_filename,
@@ -132,6 +135,68 @@ class TestPdt2Num(TestCase):
         pdt = PartialDateTime(2016)
         self.assertRaises(ValueError, pdt2num, pdt, 'days since 2016-08-20',
             'gregorian')
+
+
+class TestRemoveEmptyDirs(TestCase):
+    """
+    Test remove_empty_dirs
+    """
+    def setUp(self):
+        """
+        Create a temporary file structure with the structure:
+        .
+        |-- dir1
+        |   |-- dir2
+        |   |   `-- dir3
+        |   `-- file3
+        |-- file1
+        `-- file2
+        """
+        temp_path = tempfile.mkdtemp()
+        temp_dir = Path(temp_path)
+        dir1 = temp_dir.joinpath('dir1')
+        dir1.mkdir()
+        temp_dir.joinpath('file1').touch()
+        temp_dir.joinpath('file2').touch()
+        dir2 = dir1.joinpath('dir2')
+        dir2.mkdir()
+        dir1.joinpath('file3').touch()
+        dir2.joinpath('dir3').mkdir()
+        self.temp_dir = temp_dir
+
+    def tearDown(self):
+        """
+        Remove the temporary file structure
+        """
+        shutil.rmtree(self.temp_dir)
+
+    def test_files_deleted(self):
+        remove_empty_dirs(self.temp_dir)
+        new_tree_list = [
+            p.relative_to(self.temp_dir).as_posix()
+            for p in self.temp_dir.rglob('*')
+        ]
+        expected_tree_list = [
+            'dir1',
+            'file1',
+            'file2',
+            'dir1/file3'
+        ]
+        new_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(new_tree_list, expected_tree_list)
+
+    @mock.patch('pdata_app.utils.common.logger')
+    def test_exception(self, mock_logger):
+        # remove user write permission from dir2 so that dir3 cannot be removed
+        self.temp_dir.joinpath('dir1/dir2').chmod(0o555)
+        remove_empty_dirs(self.temp_dir)
+        dir3_path = self.temp_dir.joinpath('dir1/dir2/dir3').as_posix()
+        error_message = f"[Errno 13] Permission denied: '{dir3_path}'"
+        # restore permissions to allow tearDown() to run
+        self.temp_dir.joinpath('dir1/dir2').chmod(0o755)
+        # now it's back to normal, run assert
+        mock_logger.error.assert_called_with(error_message)
 
 
 class TestStandardiseTimeUnit(TestCase):

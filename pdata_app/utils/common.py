@@ -6,6 +6,7 @@ from __future__ import unicode_literals, division, absolute_import
 import datetime
 import logging
 import os
+from pathlib import Path
 import random
 import re
 from subprocess import check_output, CalledProcessError, STDOUT
@@ -240,6 +241,26 @@ def ilist_files(directory, suffix='.nc'):
                 yield ifile
         elif file_path.endswith(suffix):
             yield file_path
+
+
+def remove_empty_dirs(directory):
+    """
+    Descend through the directory structure below the specified directory and
+    delete any empty directories.
+
+    :param str directory: the top-level directory
+    """
+    p = Path(directory)
+    subdirs = [x for x in p.iterdir() if x.is_dir()]
+    for subdir in subdirs:
+        # descend to bottom of directory structure
+        remove_empty_dirs(subdir)
+        # now we're one level from bottom so remove empty directories
+        if not list(subdir.glob('*')):
+            try:
+                subdir.rmdir()
+            except (PermissionError, OSError) as exc:
+                logger.error(str(exc))
 
 
 def get_temp_filename(suffix):
