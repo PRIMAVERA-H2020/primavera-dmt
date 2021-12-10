@@ -182,6 +182,8 @@ class TestRemoveEmptyDirs(TestCase):
             'file2',
             'dir1/file3'
         ]
+        new_tree_list.sort()
+        expected_tree_list.sort()
         self.assertEqual(new_tree_list, expected_tree_list)
 
     @mock.patch('pdata_app.utils.common.logger')
