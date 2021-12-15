@@ -11,8 +11,6 @@ import logging.config
 
 import django
 django.setup()
-from django.template.defaultfilters import filesizeformat
-from django.db.models import Sum
 from pdata_app.models import DataRequest, Settings  # nopep8
 from pdata_app.utils.common import delete_files, exclude_hadgem_stream2  # nopep8
 
@@ -68,10 +66,7 @@ def main():
                                'variable_request__table_name',
                                'variable_request__cmor_name'):
         logger.debug(dreq)
-        # delete_files(dreq.datafile_set.all(), BASE_OUTPUT_DIR, skip_badc=True)
-        if dreq.datafile_set.filter(directory__startswith='/badc'):
-            logger.debug('!!!!Files in archive')
-        logger.debug(filesizeformat(dreq.datafile_set.distinct().aggregate(Sum('size'))['size__sum']))
+        delete_files(dreq.datafile_set.all(), BASE_OUTPUT_DIR, skip_badc=True)
 
 
 if __name__ == "__main__":
