@@ -10,6 +10,7 @@ from pathlib import Path
 import random
 import re
 from subprocess import check_output, CalledProcessError, STDOUT
+from typing import Union
 from six.moves import zip_longest
 from six import string_types
 from tempfile import gettempdir
@@ -38,12 +39,11 @@ def safe_strftime(dt, format):
     """
     datetime.strftime without >1900 restriction.
 
-    Edited from http://stackoverflow.com/questions/1526170/formatting-date-string-in-python-for-dates-prior-to-1900
+    Edited from http://stackoverflow.com/questions/1526170/formatting-date-string-in-python-for-dates-prior-to-1900  # noqa
 
     """
     if dt.year >= 1900:
         return dt.strftime(format)
-
 
     assert dt.year < 1900
     factor = (1900 - dt.year - 1) // 400 + 1
@@ -54,7 +54,8 @@ def safe_strftime(dt, format):
     assert not ('[@' in format or '@]' in format)
 
     if '%c' in format or '%x' in format:
-        raise ValueError("'%c', '%x' produce unreliable results for year < 1900")
+        raise ValueError("'%c', '%x' produce unreliable results for year "
+                         "< 1900")
 
     mark_format = format.replace('%Y', '[@%Y@]')
     from_replace = '[@%d@]' % future_year
@@ -83,7 +84,7 @@ def _checksum(checksum_method, file_path):
     Runs program `checksum_method` on `file_path` and returns the result or
     None if running the program was unsuccessful.
 
-    :param str command:
+    :param str checksum_method:
     :param str file_path:
     :return: the checksum or None if it cannot be calculated
     """
@@ -92,7 +93,7 @@ def _checksum(checksum_method, file_path):
         # checked and this is only called if file_path has been confirmed as
         # being a valid file
         ret_val = check_output("{} '{}'".format(checksum_method, file_path),
-                                shell=True).decode('utf-8')
+                               shell=True).decode('utf-8')
         # split on white space and return the first part
         checksum = ret_val.split()[0]
     except (CalledProcessError, OSError):
@@ -117,10 +118,11 @@ def make_partial_date_time(date_string):
     """
     if len(date_string) == 6:
         pdt_str = PartialDateTime(year=int(date_string[0:4]),
-            month=int(date_string[4:6]))
+                                  month=int(date_string[4:6]))
     elif len(date_string) == 8:
         pdt_str = PartialDateTime(year=int(date_string[0:4]),
-            month=int(date_string[4:6]), day=int(date_string[6:8]))
+                                  month=int(date_string[4:6]),
+                                  day=int(date_string[6:8]))
     else:
         raise ValueError('Unknown date string format')
 
@@ -131,8 +133,8 @@ def calc_last_day_in_month(year, month, calendar):
     """
     Calculate the last day of the specified month using the calendar given.
 
-    :param str year: The year
-    :param str month: The month
+    :param int year: The year
+    :param int month: The month
     :param str calendar: The calendar to use, which must be supported by
         cf_units
     :returns: The last day of the specified month
@@ -146,10 +148,10 @@ def calc_last_day_in_month(year, month, calendar):
         start_next_month_obj = netcdftime.datetime(year, month + 1, 1)
 
     start_next_month = cf_units.date2num(start_next_month_obj, ref_units,
-        calendar)
+                                         calendar)
 
     end_this_month = cf_units.num2date(start_next_month - 1, ref_units,
-        calendar)
+                                       calendar)
 
     return end_this_month.day
 
@@ -189,7 +191,7 @@ def pdt2num(pdt, time_units, calendar, start_of_period=True):
             datetime_attrs['day'] = 1
         else:
             datetime_attrs['day'] = calc_last_day_in_month(pdt.year, pdt.month,
-                calendar)
+                                                           calendar)
 
     optional_attrs = ['hour', 'minute', 'second', 'microsecond']
     for attr in optional_attrs:
@@ -243,12 +245,12 @@ def ilist_files(directory, suffix='.nc'):
             yield file_path
 
 
-def remove_empty_dirs(directory):
+def remove_empty_dirs(directory: Union[str, Path]):
     """
     Descend through the directory structure below the specified directory and
     delete any empty directories.
 
-    :param str directory: the top-level directory
+    :param directory: the top-level directory
     """
     p = Path(directory)
     subdirs = [x for x in p.iterdir() if x.is_dir()]
@@ -289,6 +291,7 @@ def standardise_time_unit(time_float, time_unit, standard_unit, calendar):
     :param float time_float: The time to change
     :param str time_unit: The original time's units
     :param str standard_unit: The new unit
+    :param str calendar: The cftime calendar
     :returns: A floating point representation of the old time in
         `standard_unit`
     """
@@ -482,9 +485,9 @@ def construct_time_string(time_point, time_units, calendar, frequency):
         msg = 'No time format known for frequency string {}'.format(frequency)
         raise NotImplementedError(msg)
 
-    datetime = cf_units.num2date(time_point, time_units, calendar)
+    datetime_obj = cf_units.num2date(time_point, time_units, calendar)
 
-    return datetime.strftime(time_fmt)
+    return datetime_obj.strftime(time_fmt)
 
 
 def get_request_size(data_reqs, start_year, end_year,
@@ -634,7 +637,7 @@ def delete_files(query_set, base_output_dir, skip_badc=False):
         # remove the associated symbolic link
         if not is_same_gws(df.directory, base_output_dir):
             sym_link_dir = os.path.join(base_output_dir,
-                                         construct_drs_path(df))
+                                        construct_drs_path(df))
             sym_link_path = os.path.join(sym_link_dir, df.name)
             if os.path.lexists(sym_link_path):
                 try:
@@ -716,12 +719,12 @@ def run_command(command):
     cmd_out = None
     try:
         cmd_out = check_output(command, stderr=STDOUT,
-                                          shell=True).decode('utf-8')
+                               shell=True).decode('utf-8')
     except CalledProcessError as exc:
         if exc.returncode == 17:
             pass
         else:
-            msg = ('Command did not complete sucessfully.\ncommmand:\n{}\n'
+            msg = ('Command did not complete sucessfully.\ncommand:\n{}\n'
                    'produced error:\n{}'.format(command, exc.output))
             logger.warning(msg)
             raise RuntimeError(msg)
