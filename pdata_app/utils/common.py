@@ -827,3 +827,36 @@ def filter_hadgem_stream2(queryset):
 
     # Combine together and return
     return low_freq | cfday | six_hr | three_hr
+
+
+def exclude_hadgem_stream2(queryset):
+    """
+    From a queryset of pdata_app.DataRequest objects return just the data
+    requests that *ARE NOT* required in the PRIMAVERA Stream 2 simulations for
+    HadGEM data.
+
+    :param django.db.models.query.QuerySet queryset:
+    :returns: Just the Stream 2 data requests
+    :rtype:  django.db.models.query.QuerySet
+    """
+    cfday = queryset.filter(
+        variable_request__table_name='CFday'
+    ).exclude(
+        variable_request__cmor_name='ps'
+    )
+
+    everything_else = queryset.exclude(
+        variable_request__frequency__in=['mon', 'day', 'fx']
+    ).exclude(
+        variable_request__table_name='Prim6hr',
+        variable_request__cmor_name='wsgmax'
+    ).exclude(
+        variable_request__table_name__in=['3hr', 'E3hr', 'E3hrPt', 'Prim3hr',
+                                          'Prim3hrPt'],
+        variable_request__cmor_name__in=['rsdsdiff', 'rsds', 'tas', 'uas',
+                                         'vas', 'ua50m', 'va50m', 'ua100m',
+                                         'va100m', 'ua7h', 'va7h', 'sfcWind',
+                                         'sfcWindmax', 'pr', 'psl', 'zg7h']
+    )
+
+    return everything_else | cfday
