@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 """
-delete_unpublishable.py
+delete_alevel.py
 
-Remove from disk any datasets that cannot be published. They will remain in the
-DMT and on tape and so can be restored to disk again if required.
+Remove from disk any EC-Earth datasets that are on atmosphere levels as these
+cannot be published to the ESGF. They will remain in the DMT and on tape and
+so can be restored to disk again if required.
 """
 import argparse
 import logging.config
@@ -42,49 +43,30 @@ def main():
     """
     Main entry point
     """
-    eday_snw = DataRequest.objects.filter(
-        variable_request__table_name='Eday',
-        variable_request__cmor_name='snw',
+    alevhalf = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        variable_request__dimensions__contains='alevhalf',
         datafile__isnull=False
-    )
+    ).distinct()
 
-    lmon_mrlsl = DataRequest.objects.filter(
-        variable_request__table_name='Lmon',
-        variable_request__cmor_name='mrlsl',
+    alevel = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        variable_request__dimensions__contains='alevel',
         datafile__isnull=False
-    )
+    ).distinct()
 
-    omon_msftmyz = DataRequest.objects.filter(
-        variable_request__table_name='Omon',
-        variable_request__cmor_name='msftmyz',
-        datafile__isnull=False
-    )
+    dreqs = alevhalf | alevel
 
-    primsiday_siuv = DataRequest.objects.filter(
-        variable_request__table_name='PrimSIday',
-        variable_request__cmor_name__in=['siu', 'siv'],
-        datafile__isnull=False
-    )
+    logger.debug(f'{dreqs.count()} data requests found')
 
-    simon_siflsaltbot = DataRequest.objects.filter(
-        variable_request__table_name='SImon',
-        variable_request__cmor_name='siflsaltbot',
-        datafile__isnull=False
-    )
-
-    awi = DataRequest.objects.filter(
-        institute__short_name='AWI',
-        datafile__isnull=False
-    )
-
-    dreqs = (eday_snw | lmon_mrlsl | omon_msftmyz | primsiday_siuv |
-             simon_siflsaltbot | awi)
-
-    logger.info(f'{dreqs.count()} data requests to delete')
-
-    for dreq in dreqs:
-        logger.debug(dreq)
-        delete_files(dreq.datafile_set.all(), BASE_OUTPUT_DIR, skip_badc=True)
+    for dreq in dreqs.order_by('climate_model__short_name',
+                               'experiment__short_name', 'rip_code',
+                               'variable_request__table_name',
+                               'variable_request__cmor_name'):
+        if dreq.online_status() in ['online', 'partial']:
+            logger.debug(dreq)
+            # delete_files(dreq.datafile_set.all(), BASE_OUTPUT_DIR,
+            #              skip_badc=True)
 
 
 if __name__ == "__main__":
