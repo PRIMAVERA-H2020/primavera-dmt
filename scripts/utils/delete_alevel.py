@@ -65,8 +65,8 @@ def main():
                                'variable_request__cmor_name'):
         if dreq.online_status() in ['online', 'partial']:
             logger.debug(dreq)
-            # delete_files(dreq.datafile_set.all(), BASE_OUTPUT_DIR,
-            #              skip_badc=True)
+            delete_files(dreq.datafile_set.all(), BASE_OUTPUT_DIR,
+                         skip_badc=True)
 
 
 if __name__ == "__main__":
