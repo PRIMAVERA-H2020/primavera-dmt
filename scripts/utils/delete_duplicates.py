@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 """
-gws_rmdir_empty_dirs.py
+delete_duplicates.py
 
-Scan through the specified path and remove any empty directories.
+Scan the specified file path and for any files found check if they are in the
+DMT, and if so delete this copy if they are already in the CEDA archive.
 """
 import argparse
 import logging.config
+from pathlib import Path
 
-from pdata_app.utils.common import remove_empty_dirs
+import django
+django.setup()
+from pdata_app.models import DataFile  # nopep8
+from pdata_app.utils.common import delete_drs_dir, ilist_files  # nopep8
 
 
 __version__ = '0.1.0b1'
@@ -15,17 +20,18 @@ __version__ = '0.1.0b1'
 logger = logging.getLogger(__name__)
 
 
-
 def parse_args():
     """
     Parse command-line arguments
     """
-    parser = argparse.ArgumentParser(description='Delete empty directories')
+    parser = argparse.ArgumentParser(description='Delete duplicates')
     parser.add_argument('-l', '--log-level',
                         help='set logging level (default: %(default)s)',
                         choices=['debug', 'info', 'warning', 'error'],
                         default='warning')
     parser.add_argument('top_path', help='the top level of the path to scan')
+    parser.add_argument('-n', '--dryrun', help="don't delete, just report",
+                        action='store_true')
     parser.add_argument('--version', action='version',
                         version='%(prog)s {}'.format(__version__))
     args = parser.parse_args()
@@ -37,7 +43,22 @@ def main(args):
     """
     Main entry point
     """
-    remove_empty_dirs(args.top_path)
+    for path in ilist_files(args.top_path):
+        data_file = Path(path)
+        try:
+            django_file = DataFile.objects.get(name=data_file.name)
+        except django.core.exceptions.ObjectDoesNotExist:
+            logger.debug(f'Not in DMT: {path}')
+            continue
+
+        if django_file.directory.startswith('/badc'):
+            if not args.dryrun:
+                action = 'Deleting'
+                data_file.unlink()
+                delete_drs_dir(str(data_file.parent))
+            else:
+                action = 'Deletable'
+            logger.debug(f'{action}: {path}')
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ def parse_args():
     """
     Parse command-line arguments
     """
-    parser = argparse.ArgumentParser(description='Update mip_era')
+    parser = argparse.ArgumentParser(description='Delete non-Stream 2')
     parser.add_argument('-l', '--log-level',
                         help='set logging level (default: %(default)s)',
                         choices=['debug', 'info', 'warning', 'error'],
