@@ -208,6 +208,38 @@ class TestListFiles(BasePathIteratorTest):
         self.assertEqual(new_tree_list, expected_tree_list)
 
 
+class TestIListFiles(BasePathIteratorTest):
+    """
+    Test ilist_files
+    """
+    def test_ilist_files_default_suffix(self):
+        new_tree_list = list(ilist_files(self.temp_dir))
+        expected_files = [
+            'file1.nc',
+            'dir1/file3.nc',
+            'dir1/file4.nc'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        new_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(new_tree_list, expected_tree_list)
+
+    def test_ilist_files_any_suffix(self):
+        new_tree_list = list(ilist_files(self.temp_dir, suffix=''))
+        expected_files = [
+            'file1.nc',
+            'file2.pp',
+            'dir1/file3.nc',
+            'dir1/file4.nc'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        new_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(new_tree_list, expected_tree_list)
+
+
 class TestRemoveEmptyDirs(BasePathIteratorTest):
     """
     Test remove_empty_dirs
