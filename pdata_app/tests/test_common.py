@@ -23,7 +23,7 @@ from pdata_app import models
 from pdata_app.utils.common import (make_partial_date_time,
                                     standardise_time_unit,
                                     calc_last_day_in_month, pdt2num,
-                                    list_files,
+                                    list_files, ilist_files,
                                     remove_empty_dirs,
                                     is_same_gws, get_gws, get_gws_any_dir,
                                     construct_drs_path,
@@ -138,9 +138,10 @@ class TestPdt2Num(TestCase):
             'gregorian')
 
 
-class TestListFiles(TestCase):
+class BasePathIteratorTest(TestCase):
     """
-    Test list_files
+    An base class for tests that involve iterating through a directory
+    structure.
     """
     def setUp(self):
         """
@@ -174,6 +175,11 @@ class TestListFiles(TestCase):
         """
         shutil.rmtree(self.temp_dir)
 
+
+class TestListFiles(BasePathIteratorTest):
+    """
+    Test list_files
+    """
     def test_list_files_default_suffix(self):
         new_tree_list = list_files(self.temp_dir)
         expected_files = [
@@ -202,39 +208,10 @@ class TestListFiles(TestCase):
         self.assertEqual(new_tree_list, expected_tree_list)
 
 
-class TestRemoveEmptyDirs(TestCase):
+class TestRemoveEmptyDirs(BasePathIteratorTest):
     """
     Test remove_empty_dirs
     """
-    def setUp(self):
-        """
-        Create a temporary file structure with the structure:
-        .
-        |-- dir1
-        |   |-- dir2
-        |   |   `-- dir3
-        |   `-- file3
-        |-- file1
-        `-- file2
-        """
-        temp_path = tempfile.mkdtemp()
-        temp_dir = Path(temp_path)
-        dir1 = temp_dir.joinpath('dir1')
-        dir1.mkdir()
-        temp_dir.joinpath('file1').touch()
-        temp_dir.joinpath('file2').touch()
-        dir2 = dir1.joinpath('dir2')
-        dir2.mkdir()
-        dir1.joinpath('file3').touch()
-        dir2.joinpath('dir3').mkdir()
-        self.temp_dir = temp_dir
-
-    def tearDown(self):
-        """
-        Remove the temporary file structure
-        """
-        shutil.rmtree(self.temp_dir)
-
     def test_files_deleted(self):
         remove_empty_dirs(self.temp_dir)
         new_tree_list = [
@@ -243,9 +220,10 @@ class TestRemoveEmptyDirs(TestCase):
         ]
         expected_tree_list = [
             'dir1',
-            'file1',
-            'file2',
-            'dir1/file3'
+            'file1.nc',
+            'file2.pp',
+            'dir1/file3.nc',
+            'dir1/file4.nc'
         ]
         new_tree_list.sort()
         expected_tree_list.sort()
