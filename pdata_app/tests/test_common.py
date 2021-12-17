@@ -23,6 +23,7 @@ from pdata_app import models
 from pdata_app.utils.common import (make_partial_date_time,
                                     standardise_time_unit,
                                     calc_last_day_in_month, pdt2num,
+                                    list_files,
                                     remove_empty_dirs,
                                     is_same_gws, get_gws, get_gws_any_dir,
                                     construct_drs_path,
@@ -135,6 +136,70 @@ class TestPdt2Num(TestCase):
         pdt = PartialDateTime(2016)
         self.assertRaises(ValueError, pdt2num, pdt, 'days since 2016-08-20',
             'gregorian')
+
+
+class TestListFiles(TestCase):
+    """
+    Test list_files
+    """
+    def setUp(self):
+        """
+        Create a temporary file structure with the structure:
+        .
+        |-- dir1
+        |   |-- dir2
+        |   |   `-- dir3
+        |   `-- file3.nc
+        |   `-- file4.nc -> file3.nc
+        |-- file1.nc
+        `-- file2.pp
+        """
+        temp_path = tempfile.mkdtemp()
+        temp_dir = Path(temp_path)
+        dir1 = temp_dir.joinpath('dir1')
+        dir1.mkdir()
+        temp_dir.joinpath('file1.nc').touch()
+        temp_dir.joinpath('file2.pp').touch()
+        dir2 = dir1.joinpath('dir2')
+        dir2.mkdir()
+        file3 = dir1.joinpath('file3.nc')
+        file3.touch()
+        dir1.joinpath('file4.nc').symlink_to(file3)
+        dir2.joinpath('dir3').mkdir()
+        self.temp_dir = temp_dir
+
+    def tearDown(self):
+        """
+        Remove the temporary file structure
+        """
+        shutil.rmtree(self.temp_dir)
+
+    def test_list_files_default_suffix(self):
+        new_tree_list = list_files(self.temp_dir)
+        expected_files = [
+            'file1.nc',
+            'dir1/file3.nc',
+            'dir1/file4.nc'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        new_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(new_tree_list, expected_tree_list)
+
+    def test_list_files_any_suffix(self):
+        new_tree_list = list_files(self.temp_dir, suffix='')
+        expected_files = [
+            'file1.nc',
+            'file2.pp',
+            'dir1/file3.nc',
+            'dir1/file4.nc'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        new_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(new_tree_list, expected_tree_list)
 
 
 class TestRemoveEmptyDirs(TestCase):
