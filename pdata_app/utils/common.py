@@ -204,13 +204,14 @@ def pdt2num(pdt, time_units, calendar, start_of_period=True):
     return cf_units.date2num(dt_obj, time_units, calendar)
 
 
-def list_files(directory, suffix='.nc'):
+def list_files(directory, suffix='.nc', ignore_symlinks=False):
     """
     Return a list of all the files with the specified suffix in the submission
     directory structure and sub-directories.
 
     :param str directory: The root directory of the submission
     :param str suffix: The suffix of the files of interest
+    :param bool ignore_symlinks: if True then don't return symbolic links
     :returns: A list of absolute filepaths
     """
     nc_files = []
@@ -219,30 +220,41 @@ def list_files(directory, suffix='.nc'):
     for filename in dir_files:
         file_path = os.path.join(directory, filename)
         if os.path.isdir(file_path):
-            nc_files.extend(list_files(file_path, suffix))
+            nc_files.extend(list_files(file_path, suffix=suffix,
+                                       ignore_symlinks=ignore_symlinks))
         elif file_path.endswith(suffix):
-            nc_files.append(file_path)
+            if ignore_symlinks:
+                if not os.path.islink(file_path):
+                    nc_files.append(file_path)
+            else:
+                nc_files.append(file_path)
 
     return nc_files
 
 
-def ilist_files(directory, suffix='.nc'):
+def ilist_files(directory, suffix='.nc', ignore_symlinks=False):
     """
     Return an iterator of all the files with the specified suffix in the
     submission directory structure and sub-directories.
 
     :param str directory: The root directory of the submission
     :param str suffix: The suffix of the files of interest
-    :returns: A list of absolute filepaths
+    :param bool ignore_symlinks: if True then don't return symbolic links
+    :returns: Absolute filepaths as a string
     """
     dir_files = os.listdir(directory)
     for filename in dir_files:
         file_path = os.path.join(directory, filename)
         if os.path.isdir(file_path):
-            for ifile in ilist_files(file_path):
+            for ifile in ilist_files(file_path, suffix=suffix,
+                                     ignore_symlinks=ignore_symlinks):
                 yield ifile
         elif file_path.endswith(suffix):
-            yield file_path
+            if ignore_symlinks:
+                if not os.path.islink(file_path):
+                    yield file_path
+            else:
+                yield file_path
 
 
 def remove_empty_dirs(directory: Union[str, Path]):
