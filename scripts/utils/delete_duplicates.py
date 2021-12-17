@@ -24,12 +24,14 @@ def parse_args():
     """
     Parse command-line arguments
     """
-    parser = argparse.ArgumentParser(description='Update mip_era')
+    parser = argparse.ArgumentParser(description='Delete duplicates')
     parser.add_argument('-l', '--log-level',
                         help='set logging level (default: %(default)s)',
                         choices=['debug', 'info', 'warning', 'error'],
                         default='warning')
     parser.add_argument('top_path', help='the top level of the path to scan')
+    parser.add_argument('-n', '--dryrun', help="don't delete, just report",
+                        action='store_true')
     parser.add_argument('--version', action='version',
                         version='%(prog)s {}'.format(__version__))
     args = parser.parse_args()
@@ -50,9 +52,13 @@ def main(args):
             continue
 
         if django_file.directory.startswith('/badc'):
-            logger.debug('Deleting: {path}')
-            # data_file.unlink()
-            # delete_drs_dir(str(data_file.parent))
+            if not args.dryrun:
+                action = 'Deleting'
+                data_file.unlink()
+                delete_drs_dir(str(data_file.parent))
+            else:
+                action = 'Deletable'
+            logger.debug(f'{action}: {path}')
 
 
 if __name__ == "__main__":
