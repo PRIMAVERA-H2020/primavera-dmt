@@ -23,6 +23,7 @@ from pdata_app import models
 from pdata_app.utils.common import (make_partial_date_time,
                                     standardise_time_unit,
                                     calc_last_day_in_month, pdt2num,
+                                    list_files, ilist_files,
                                     remove_empty_dirs,
                                     is_same_gws, get_gws, get_gws_any_dir,
                                     construct_drs_path,
@@ -137,9 +138,10 @@ class TestPdt2Num(TestCase):
             'gregorian')
 
 
-class TestRemoveEmptyDirs(TestCase):
+class BasePathIteratorTest(TestCase):
     """
-    Test remove_empty_dirs
+    An base class for tests that involve iterating through a directory
+    structure.
     """
     def setUp(self):
         """
@@ -148,19 +150,24 @@ class TestRemoveEmptyDirs(TestCase):
         |-- dir1
         |   |-- dir2
         |   |   `-- dir3
-        |   `-- file3
-        |-- file1
-        `-- file2
+        |   `-- file3.nc
+        |   `-- file4.nc -> file3.nc
+        |   `-- file5.pp
+        |-- file1.nc
+        `-- file2.pp
         """
         temp_path = tempfile.mkdtemp()
         temp_dir = Path(temp_path)
         dir1 = temp_dir.joinpath('dir1')
         dir1.mkdir()
-        temp_dir.joinpath('file1').touch()
-        temp_dir.joinpath('file2').touch()
+        temp_dir.joinpath('file1.nc').touch()
+        temp_dir.joinpath('file2.pp').touch()
         dir2 = dir1.joinpath('dir2')
         dir2.mkdir()
-        dir1.joinpath('file3').touch()
+        file3 = dir1.joinpath('file3.nc')
+        file3.touch()
+        dir1.joinpath('file4.nc').symlink_to(file3)
+        dir1.joinpath('file5.pp').touch()
         dir2.joinpath('dir3').mkdir()
         self.temp_dir = temp_dir
 
@@ -170,6 +177,101 @@ class TestRemoveEmptyDirs(TestCase):
         """
         shutil.rmtree(self.temp_dir)
 
+
+class TestListFiles(BasePathIteratorTest):
+    """
+    Test list_files
+    """
+    def test_list_files_default_suffix(self):
+        actual_tree_list = list_files(self.temp_dir)
+        expected_files = [
+            'file1.nc',
+            'dir1/file3.nc',
+            'dir1/file4.nc'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        actual_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(actual_tree_list, expected_tree_list)
+
+    def test_list_files_any_suffix(self):
+        actual_tree_list = list_files(self.temp_dir, suffix='')
+        expected_files = [
+            'file1.nc',
+            'file2.pp',
+            'dir1/file3.nc',
+            'dir1/file4.nc',
+            'dir1/file5.pp'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        actual_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(actual_tree_list, expected_tree_list)
+
+    def test_list_files_ignore_symlinks(self):
+        actual_tree_list = list_files(self.temp_dir, ignore_symlinks=True)
+        expected_files = [
+            'file1.nc',
+            'dir1/file3.nc'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        actual_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(actual_tree_list, expected_tree_list)
+
+
+class TestIListFiles(BasePathIteratorTest):
+    """
+    Test ilist_files
+    """
+    def test_ilist_files_default_suffix(self):
+        new_tree_list = list(ilist_files(self.temp_dir))
+        expected_files = [
+            'file1.nc',
+            'dir1/file3.nc',
+            'dir1/file4.nc'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        new_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(new_tree_list, expected_tree_list)
+
+    def test_ilist_files_any_suffix(self):
+        new_tree_list = list(ilist_files(self.temp_dir, suffix=''))
+        expected_files = [
+            'file1.nc',
+            'file2.pp',
+            'dir1/file3.nc',
+            'dir1/file4.nc',
+            'dir1/file5.pp'
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        new_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(new_tree_list, expected_tree_list)
+
+    def test_ilist_files_ignore_symlinks(self):
+        new_tree_list = list(ilist_files(self.temp_dir, ignore_symlinks=True))
+        expected_files = [
+            'file1.nc',
+            'dir1/file3.nc',
+        ]
+        expected_tree_list = [self.temp_dir.joinpath(ef).as_posix()
+                              for ef in expected_files]
+        new_tree_list.sort()
+        expected_tree_list.sort()
+        self.assertEqual(new_tree_list, expected_tree_list)
+
+
+class TestRemoveEmptyDirs(BasePathIteratorTest):
+    """
+    Test remove_empty_dirs
+    """
     def test_files_deleted(self):
         remove_empty_dirs(self.temp_dir)
         new_tree_list = [
@@ -178,9 +280,11 @@ class TestRemoveEmptyDirs(TestCase):
         ]
         expected_tree_list = [
             'dir1',
-            'file1',
-            'file2',
-            'dir1/file3'
+            'file1.nc',
+            'file2.pp',
+            'dir1/file3.nc',
+            'dir1/file4.nc',
+            'dir1/file5.pp'
         ]
         new_tree_list.sort()
         expected_tree_list.sort()
