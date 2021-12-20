@@ -43,7 +43,7 @@ def main(args):
     """
     Main entry point
     """
-    for path in ilist_files(args.top_path):
+    for path in ilist_files(args.top_path, ignore_symlinks=True):
         data_file = Path(path)
         try:
             django_file = DataFile.objects.get(name=data_file.name)
