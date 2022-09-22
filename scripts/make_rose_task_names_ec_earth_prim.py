@@ -201,11 +201,23 @@ def main(args):
         datafile__isnull=False
     ).distinct()
 
+    spinup_lr_all = DataRequest.objects.filter(
+        institute__short_name='EC-Earth-Consortium',
+        climate_model__short_name='EC-Earth3P',
+        experiment__short_name='spinup-1950',
+        rip_code='r1i1p2f1',
+        datafile__isnull=False
+    ).exclude(
+        variable_request__dimensions__contains='alevhalf'
+    ).exclude(
+        variable_request__dimensions__contains='alevel'
+    ).distinct()
+
     # task querysets can be ORed together with |
 
     all_tasks = (highres_future_r1p2 | highres_future_r2p2 | highres_future_r3p2 | amip_future |
                  amip_past_lr | amip_past_hr | hist_lr | hist_hr | ctrl_lr | ctrl_hr | 
-                 upwelling_flux | amip_r1 | fx)
+                 upwelling_flux | amip_r1 | fx | spinup_lr_all)
 
     task_name_list = [
         '{}_{}_{}_{}_{}'.format(dr.climate_model.short_name,

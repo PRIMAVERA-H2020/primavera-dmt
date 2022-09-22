@@ -122,6 +122,7 @@ def main(args):
             try:
                 dreq.delete()
             except django.db.models.deletion.ProtectedError:
+                logger.warning('Unable to delete CMIP6 data_request so renaming to r9i9p9f9')
                 dreq.rip_code = 'r9i9p9f9'
                 dreq.save()
 

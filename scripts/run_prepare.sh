@@ -19,8 +19,8 @@ elif grep -q '01.00.21' <<< `ncdump -h $1`; then
 elif grep -q '01.00.23' <<< `ncdump -h $1`; then
     TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/primavera_1.00.23/Tables
 elif grep -q '01.00.27' <<< `ncdump -h $1`; then
-    TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/cmip6-cmor-tables-6.2.11.2/Tables
-    CMOR=cmor_3_4_0
+    TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/cmip6-cmor-tables-6.3.27/Tables
+    CMOR=cmor_3_5
 elif grep -q '01.00.28' <<< `ncdump -h $1`; then
     TABLE_DIR=/home/users/jseddon/primavera/original-cmor-tables/cmip6-cmor-tables-6.2.15.0/Tables
     CMOR=cmor_3_4_0

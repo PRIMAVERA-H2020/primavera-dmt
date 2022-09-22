@@ -53,7 +53,7 @@ def main(args):
     """
     dreqs = DataRequest.objects.filter(
         project__short_name='CMIP6',
-        climate_model__short_name='EC-Earth3P',
+        climate_model__short_name='EC-Earth3P-HR',
         experiment__short_name__contains='primWP5-amv',
         rip_code=args.variant_label
     ).distinct()

@@ -123,17 +123,28 @@ def main(args):
     # 
     # data_reqs = mon_reqs | day_reqs
 
+    # data_reqs = DataRequest.objects.filter(
+    #     climate_model__short_name='EC-Earth3P-HR',
+    #     experiment__short_name='hist-1950',
+    #     rip_code='r3i1p2f1',
+    #     # variable_request__table_name='6hrPlevPt',
+    #     # variable_request__cmor_name__in=['uas', 'vas', 'vortmean', 'snw', 'tas', 'psl',
+    #     #                                  'mrsos', 'ts', 'huss', 'sfcWind', 'tsl'],
+    #     variable_request__frequency='day',
+    #      datafile__isnull=False
+    # ).exclude(
+    #     variable_request__table_name__startswith='Prim'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevhalf'
+    # ).exclude(
+    #     variable_request__dimensions__contains='alevel'
+    # ).distinct()
+
     data_reqs = DataRequest.objects.filter(
-        climate_model__short_name='EC-Earth3P-HR',
-        experiment__short_name='hist-1950',
-        rip_code='r3i1p2f1',
-        # variable_request__table_name='6hrPlevPt',
-        # variable_request__cmor_name__in=['uas', 'vas', 'vortmean', 'snw', 'tas', 'psl',
-        #                                  'mrsos', 'ts', 'huss', 'sfcWind', 'tsl'],
-        variable_request__frequency='day',
+        climate_model__short_name='EC-Earth3P',
+        experiment__short_name='spinup-1950',
+        rip_code='r1i1p2f1',
          datafile__isnull=False
-    ).exclude(
-        variable_request__table_name__startswith='Prim'
     ).exclude(
         variable_request__dimensions__contains='alevhalf'
     ).exclude(
