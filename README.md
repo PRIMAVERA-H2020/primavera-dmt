@@ -3,6 +3,8 @@
 # primavera-dmt
 PRIMAVERA Data Management Tool
 
+This is the original version of the DMT developed and implemented for the PRIMAVERA project. This version makes some assumptions about the layout of the storage at JASMIN and all data files must comply with the CMIP6 metadata standards. Development of a more generic successor has begun at https://github.com/MetOffice/primavera-dmt and everyone is invited to use or contribute to the new version.
+
 ### Quick set-up
 
 1. Load a Conda or virtualenv environment containing:   
