@@ -19,8 +19,8 @@ jobs:
       run: |
         sudo apt-get install libudunits2-dev
         python -m pip install --upgrade pip
-        pip install Cython
-        pip install -r requirements.txt
+        python -m pip install Cython
+        python -m pip install -r requirements.txt
     - name: Configure Django
       run: |
         which python
