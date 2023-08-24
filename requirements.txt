@@ -5,7 +5,7 @@ django-solo
 django-tables2
 mock
 numpy
-netcdftime
+cftime
 cf-units
 partial-date-time
 psycopg2
